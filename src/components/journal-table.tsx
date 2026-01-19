@@ -295,6 +295,9 @@ export function JournalTable() {
       // Don't allow going to a month entirely before the start date
       const prevMonthStart = startOfMonth(subMonths(currentMonth, 1))
       const configMonthStart = startOfMonth(config.startDate)
+      
+      // If previous month is before or same as start month, we check if we can actually show data
+      // For simplicity, if previous month start is BEFORE config month start, we block
       if (prevMonthStart < configMonthStart) {
         setIsLoading(false)
         return
