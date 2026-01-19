@@ -23,6 +23,7 @@ import { Pencil, Check, ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { journalService, type JournalEntryData, type WeeklyNoteData } from "@/services/journal-service"
 import { toast } from "sonner"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface JournalEntry {
   date: Date
@@ -256,15 +257,22 @@ export function JournalTable() {
   }
 
   const handlePrevMonth = () => {
+    setIsLoading(true)
     if (config.startDate) {
       // Don't allow going to a month entirely before the start date
       const prevMonthStart = startOfMonth(subMonths(currentMonth, 1))
       const configMonthStart = startOfMonth(config.startDate)
-      if (prevMonthStart < configMonthStart) return
+      if (prevMonthStart < configMonthStart) {
+        setIsLoading(false)
+        return
+      }
     }
     setCurrentMonth(prev => subMonths(prev, 1))
   }
-  const handleNextMonth = () => setCurrentMonth(prev => addMonths(prev, 1))
+  const handleNextMonth = () => {
+    setIsLoading(true)
+    setCurrentMonth(prev => addMonths(prev, 1))
+  }
 
   return (
     <div className="space-y-6">
@@ -326,7 +334,25 @@ export function JournalTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {weeks.map(([weekKey, weekDays]) => {
+            {isLoading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <TableRow key={`skeleton-${i}`} className="border-b">
+                   <TableCell className="h-12 py-1"><Skeleton className="h-4 w-24" /></TableCell>
+                   <TableCell className="h-12 py-1"><Skeleton className="h-4 w-16" /></TableCell>
+                   <TableCell className="h-12 py-1"><Skeleton className="h-4 w-16" /></TableCell>
+                   <TableCell className="h-12 py-1"><Skeleton className="h-4 w-16" /></TableCell>
+                   <TableCell className="h-12 py-1"><Skeleton className="h-4 w-16" /></TableCell>
+                   <TableCell className="h-12 py-1"><Skeleton className="h-4 w-16" /></TableCell>
+                   <TableCell className="h-12 py-1"><Skeleton className="h-4 w-32" /></TableCell>
+                   <TableCell className="h-12 py-1"><Skeleton className="h-4 w-16" /></TableCell>
+                   <TableCell className="h-12 py-1"><Skeleton className="h-4 w-16" /></TableCell>
+                   <TableCell className="h-12 py-1"><Skeleton className="h-4 w-16" /></TableCell>
+                   <TableCell className="h-12 py-1"><Skeleton className="h-4 w-16" /></TableCell>
+                   <TableCell className="h-12 py-1"></TableCell>
+                </TableRow>
+              ))
+            ) : (
+             weeks.map(([weekKey, weekDays]) => {
               const totals = getWeeklyTotals(weekDays)
               
               return (
@@ -418,8 +444,8 @@ export function JournalTable() {
                             variant="ghost" 
                             size="icon" 
                             className={cn(
-                              "h-6 w-6 opacity-0 group-hover:opacity-100",
-                              isLoading && "group-hover:opacity-0"
+                              "h-6 w-6 opacity-0 group-hover:opacity-100 transition-none",
+                              isLoading && "opacity-0 pointer-events-none"
                             )}
                             onClick={() => toggleEdit(dateStr)}
                             disabled={isLoading}
@@ -469,7 +495,7 @@ export function JournalTable() {
                 <TableRow className="h-4 bg-transparent border-none hover:bg-transparent pointer-events-none"><TableCell colSpan={12}></TableCell></TableRow>
               </React.Fragment>
             )
-            })}
+            }))}
           </TableBody>
         </table>
       </div>

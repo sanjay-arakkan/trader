@@ -30,7 +30,7 @@ export const journalService = {
       .lte('date', endStr)
 
     if (error) {
-      console.error('Error fetching entries:', error)
+      console.error('Error fetching entries:', JSON.stringify(error, Object.getOwnPropertyNames(error)))
       return []
     }
     return data

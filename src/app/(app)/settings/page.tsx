@@ -7,6 +7,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
+import { Calendar } from "@/components/ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
+import { format } from "date-fns"
+import { Calendar as CalendarIcon } from "lucide-react"
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme()
@@ -110,25 +115,28 @@ import { toast } from "sonner"
 
 function ConfigurationForm() {
   const [initialCapital, setInitialCapital] = React.useState("")
-  const [startDate, setStartDate] = React.useState("")
-  const [savedConfig, setSavedConfig] = React.useState({ initialCapital: "", startDate: "" })
+  const [startDate, setStartDate] = React.useState<Date | undefined>(undefined)
+  const [savedConfig, setSavedConfig] = React.useState<{ initialCapital: string, startDate: string }>({ initialCapital: "", startDate: "" })
 
   React.useEffect(() => {
     const configStr = localStorage.getItem("trader_config")
     if (configStr) {
       const config = JSON.parse(configStr)
       const initialCapital = config.initialCapital || ""
-      const startDate = config.startDate || ""
+      const startDateStr = config.startDate || ""
       setInitialCapital(initialCapital)
-      setStartDate(startDate)
-      setSavedConfig({ initialCapital, startDate })
+      if (startDateStr) {
+          setStartDate(new Date(startDateStr))
+      }
+      setSavedConfig({ initialCapital, startDate: startDateStr })
     }
   }, [])
 
-  const hasChanges = initialCapital !== savedConfig.initialCapital || startDate !== savedConfig.startDate
+  const startDateStr = startDate ? format(startDate, "yyyy-MM-dd") : ""
+  const hasChanges = initialCapital !== savedConfig.initialCapital || startDateStr !== savedConfig.startDate
 
   const handleSave = () => {
-    const newConfig = { initialCapital, startDate }
+    const newConfig = { initialCapital, startDate: startDateStr }
     localStorage.setItem("trader_config", JSON.stringify(newConfig))
     setSavedConfig(newConfig)
     toast.success("Configuration saved successfully!")
@@ -149,12 +157,28 @@ function ConfigurationForm() {
         </div>
         <div className="space-y-2">
           <Label htmlFor="start-date">Starting Date</Label>
-          <Input 
-            id="start-date"
-            type="date" 
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
+          <Popover>
+            <PopoverTrigger asChild>
+                <Button
+                    variant={"outline"}
+                    className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !startDate && "text-muted-foreground"
+                    )}
+                >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {startDate ? format(startDate, "PPP") : <span>Pick a date</span>}
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                    mode="single"
+                    selected={startDate}
+                    onSelect={setStartDate}
+                    initialFocus
+                />
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
       <Button 
