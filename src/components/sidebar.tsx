@@ -10,9 +10,11 @@ import {
   Settings,
   LogOut,
   Activity,
+  Menu,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet"
 
 interface SidebarProps {
   userName: string
@@ -41,7 +43,8 @@ const navItems = [
   },
 ]
 
-export function Sidebar({ userName }: SidebarProps) {
+
+function SidebarContent({ userName, mobile }: { userName: string; mobile?: boolean }) {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
@@ -53,7 +56,7 @@ export function Sidebar({ userName }: SidebarProps) {
   }
 
   return (
-    <aside className="flex h-screen w-64 flex-col border-r border-border bg-sidebar">
+    <div className="flex h-full flex-col bg-sidebar">
       {/* Logo/Brand */}
       <div className="flex h-16 items-center gap-2 border-b border-border px-6">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
@@ -68,7 +71,7 @@ export function Sidebar({ userName }: SidebarProps) {
       <nav className="flex-1 space-y-1 p-4">
         {navItems.map((item) => {
           const isActive = pathname === item.href
-          return (
+          const LinkComponent = (
             <Link
               key={item.href}
               href={item.href}
@@ -83,6 +86,16 @@ export function Sidebar({ userName }: SidebarProps) {
               {item.name}
             </Link>
           )
+
+          if (mobile) {
+            return (
+              <SheetClose asChild key={item.href}>
+                {LinkComponent}
+              </SheetClose>
+            )
+          }
+
+          return LinkComponent
         })}
       </nav>
 
@@ -103,6 +116,37 @@ export function Sidebar({ userName }: SidebarProps) {
           Log out
         </Button>
       </div>
-    </aside>
+    </div>
+  )
+}
+
+export function Sidebar({ userName }: SidebarProps) {
+  return (
+    <>
+      {/* Mobile Sidebar (Sheet) */}
+      <div className="flex md:hidden items-center p-4 border-b bg-sidebar">
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon" className="mr-2">
+              <Menu className="h-6 w-6" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="p-0 w-72">
+            <SidebarContent userName={userName} mobile />
+          </SheetContent>
+        </Sheet>
+        <div className="flex items-center gap-2">
+           <div className="flex h-6 w-6 items-center justify-center rounded bg-primary">
+             <Activity className="h-4 w-4 text-primary-foreground" />
+           </div>
+           <span className="font-semibold">Trader</span>
+        </div>
+      </div>
+
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex h-screen w-64 flex-col border-r border-border bg-sidebar">
+        <SidebarContent userName={userName} />
+      </aside>
+    </>
   )
 }
