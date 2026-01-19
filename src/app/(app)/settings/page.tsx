@@ -21,8 +21,14 @@ export default function SettingsPage() {
   // Avoid hydration mismatch by only rendering after mount
   React.useEffect(() => {
     setMounted(true)
+  }, [])
+
+  // Sync theme only once on mount
+  const syncedRef = React.useRef(false)
+  React.useEffect(() => {
+    if (syncedRef.current) return
+    syncedRef.current = true
     
-    // Sync theme with database if possible
     const syncTheme = async () => {
         const settings = await journalService.getSettings()
         if (settings?.theme) {
