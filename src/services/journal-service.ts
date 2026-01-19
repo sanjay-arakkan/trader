@@ -16,6 +16,12 @@ export type WeeklyNoteData = {
   note: string
 }
 
+export type UserSettings = {
+  theme?: string
+  initial_capital?: number
+  start_date?: string
+}
+
 const supabase = createClient()
 
 export const journalService = {
@@ -101,6 +107,46 @@ export const journalService = {
     
     if (error) {
       console.error('Error saving note:', error)
+      throw error
+    }
+    return data
+  },
+
+  async getSettings() {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return null
+
+    const { data, error } = await supabase
+      .from('user_settings')
+      .select('*')
+      .eq('user_id', user.id)
+      .single()
+
+    if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+      console.error('Error fetching settings:', error)
+      return null
+    }
+    return data
+  },
+
+  async updateSettings(settings: UserSettings) {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return null
+
+    const payload = {
+      ...settings,
+      user_id: user.id,
+      updated_at: new Date().toISOString()
+    }
+
+    const { data, error } = await supabase
+      .from('user_settings')
+      .upsert(payload)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Error updating settings:', error)
       throw error
     }
     return data

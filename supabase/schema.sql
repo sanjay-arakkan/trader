@@ -60,5 +60,21 @@ ALTER TABLE public.weekly_journal_notes ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can manage own weekly notes" ON public.weekly_journal_notes
     FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
--- 4. Sample Whitelist Entry (Optional)
+-- 4. User Settings Table
+CREATE TABLE IF NOT EXISTS public.user_settings (
+    user_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    theme TEXT DEFAULT 'system',
+    initial_capital DECIMAL(15, 2),
+    start_date DATE,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Enable RLS for user_settings
+ALTER TABLE public.user_settings ENABLE ROW LEVEL SECURITY;
+
+-- Policies for user_settings
+CREATE POLICY "Users can manage own settings" ON public.user_settings
+    FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+
+-- 5. Sample Whitelist Entry (Optional)
 -- INSERT INTO public.user_access (email) VALUES ('your-email@example.com');

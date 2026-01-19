@@ -12,6 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import { Calendar as CalendarIcon } from "lucide-react"
+import { journalService } from "@/services/journal-service"
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme()
@@ -20,7 +21,25 @@ export default function SettingsPage() {
   // Avoid hydration mismatch by only rendering after mount
   React.useEffect(() => {
     setMounted(true)
-  }, [])
+    
+    // Sync theme with database if possible
+    const syncTheme = async () => {
+        const settings = await journalService.getSettings()
+        if (settings?.theme) {
+            setTheme(settings.theme)
+        }
+    }
+    syncTheme()
+  }, [setTheme])
+
+  const handleThemeChange = async (newTheme: string) => {
+      setTheme(newTheme)
+      try {
+          await journalService.updateSettings({ theme: newTheme })
+      } catch (e) {
+          console.error("Failed to sync theme to DB", e)
+      }
+  }
 
   if (!mounted) {
     return null
@@ -78,7 +97,7 @@ export default function SettingsPage() {
                 <Button
                   variant={theme === "light" ? "default" : "outline"}
                   className="flex h-auto flex-col items-center gap-2 py-4"
-                  onClick={() => setTheme("light")}
+                  onClick={() => handleThemeChange("light")}
                 >
                   <Sun className="h-5 w-5" />
                   <span className="text-xs">Light</span>
@@ -86,7 +105,7 @@ export default function SettingsPage() {
                 <Button
                   variant={theme === "dark" ? "default" : "outline"}
                   className="flex h-auto flex-col items-center gap-2 py-4"
-                  onClick={() => setTheme("dark")}
+                  onClick={() => handleThemeChange("dark")}
                 >
                   <Moon className="h-5 w-5" />
                   <span className="text-xs">Dark</span>
@@ -94,7 +113,7 @@ export default function SettingsPage() {
                 <Button
                   variant={theme === "system" ? "default" : "outline"}
                   className="flex h-auto flex-col items-center gap-2 py-4"
-                  onClick={() => setTheme("system")}
+                  onClick={() => handleThemeChange("system")}
                 >
                   <Monitor className="h-5 w-5" />
                   <span className="text-xs">System</span>
@@ -119,27 +138,57 @@ function ConfigurationForm() {
   const [savedConfig, setSavedConfig] = React.useState<{ initialCapital: string, startDate: string }>({ initialCapital: "", startDate: "" })
 
   React.useEffect(() => {
-    const configStr = localStorage.getItem("trader_config")
-    if (configStr) {
-      const config = JSON.parse(configStr)
-      const initialCapital = config.initialCapital || ""
-      const startDateStr = config.startDate || ""
-      setInitialCapital(initialCapital)
-      if (startDateStr) {
-          setStartDate(new Date(startDateStr))
-      }
-      setSavedConfig({ initialCapital, startDate: startDateStr })
+    const loadConfig = async () => {
+        // Try DB first
+        const settings = await journalService.getSettings()
+        if (settings) {
+            const initialCapital = settings.initial_capital?.toString() || ""
+            const startDateStr = settings.start_date || ""
+            setInitialCapital(initialCapital)
+            if (startDateStr) setStartDate(new Date(startDateStr))
+            setSavedConfig({ initialCapital, startDate: startDateStr })
+            // Back-fill localStorage
+            localStorage.setItem("trader_config", JSON.stringify({ initialCapital, startDate: startDateStr }))
+            return
+        }
+
+        // Fallback to localStorage
+        const configStr = localStorage.getItem("trader_config")
+        if (configStr) {
+          const config = JSON.parse(configStr)
+          const initialCapital = config.initialCapital || ""
+          const startDateStr = config.startDate || ""
+          setInitialCapital(initialCapital)
+          if (startDateStr) {
+              setStartDate(new Date(startDateStr))
+          }
+          setSavedConfig({ initialCapital, startDate: startDateStr })
+        }
     }
+    loadConfig()
   }, [])
 
   const startDateStr = startDate ? format(startDate, "yyyy-MM-dd") : ""
   const hasChanges = initialCapital !== savedConfig.initialCapital || startDateStr !== savedConfig.startDate
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const newConfig = { initialCapital, startDate: startDateStr }
-    localStorage.setItem("trader_config", JSON.stringify(newConfig))
-    setSavedConfig(newConfig)
-    toast.success("Configuration saved successfully!")
+    
+    try {
+        // Persist to DB
+        await journalService.updateSettings({
+            initial_capital: parseFloat(initialCapital) || 0,
+            start_date: startDateStr
+        })
+        
+        // Update local state
+        localStorage.setItem("trader_config", JSON.stringify(newConfig))
+        setSavedConfig(newConfig)
+        toast.success("Configuration saved and synced!")
+    } catch (e) {
+        console.error("Failed to save settings", e)
+        toast.error("Failed to sync settings to database")
+    }
   }
 
   return (
