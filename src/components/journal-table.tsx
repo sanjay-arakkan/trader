@@ -188,7 +188,11 @@ export function JournalTable() {
       maxBrokerage: maxBrokerage > 0 ? formatCurrency(maxBrokerage.toFixed(0)) : "",
       brokPercent: brokerage === 0 ? "0.00%" : profit !== 0 ? brokPercent.toFixed(2) + "%" : "", 
       profitPercent: manualCapital > 0 ? profitPercent.toFixed(2) + "%" : "",
-      isHighBrokerage: brokerage > maxBrokerage
+      isHighBrokerage: brokerage > maxBrokerage,
+      rawTarget: target,
+      rawMaxSL: maxSL,
+      rawProfit: profit,
+      rawProfitPercent: profitPercent
     }
   }
 
@@ -436,7 +440,11 @@ export function JournalTable() {
                               className="w-24 h-8"
                             />
                          ) : (
-                            <span className="text-foreground font-bold">{entry.profit ? formatCurrency(entry.profit) : ""}</span>
+                            <span className={cn(
+                              "font-bold",
+                              calculated.rawProfit > (calculated.rawTarget || 0) && calculated.rawTarget > 0 ? "text-green-600" : 
+                              calculated.rawProfit < -(calculated.rawMaxSL || 0) && calculated.rawMaxSL > 0 ? "text-red-600" : "text-foreground"
+                            )}>{entry.profit ? formatCurrency(entry.profit) : ""}</span>
                          )}
                       </TableCell>
                       <TableCell className="h-12 py-1">
@@ -459,7 +467,8 @@ export function JournalTable() {
                       <TableCell className="h-12 py-1">{calculated.brokPercent}</TableCell>
                       <TableCell className={cn(
                         "font-medium h-12 py-1",
-                        parseFloat(entry.profit) - parseFloat(entry.brokerage) > 0 ? "text-green-600" : parseFloat(entry.profit) - parseFloat(entry.brokerage) < 0 ? "text-red-600" : ""
+                        calculated.rawProfitPercent > 1 ? "text-green-600" : 
+                        calculated.rawProfitPercent < 0 ? "text-red-600" : "text-foreground"
                       )}>
                         {calculated.profitPercent}
                       </TableCell>
