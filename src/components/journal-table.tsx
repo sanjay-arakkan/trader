@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { Pencil, Check, ChevronLeft, ChevronRight } from "lucide-react"
+import { Pencil, Check, ChevronLeft, ChevronRight, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { journalService, type JournalEntryData, type WeeklyNoteData } from "@/services/journal-service"
 import { toast } from "sonner"
@@ -42,8 +42,11 @@ export function JournalTable() {
   const [weekNotes, setWeekNotes] = React.useState<Record<string, string>>({})
   const [config, setConfig] = React.useState<Config>({ initialCapital: 0, startDate: null })
   const [editingRow, setEditingRow] = React.useState<string | null>(null)
+  const [editingNote, setEditingNote] = React.useState<string | null>(null)
   const [currentMonth, setCurrentMonth] = React.useState(new Date())
   const [isLoading, setIsLoading] = React.useState(false)
+  const [originalEntry, setOriginalEntry] = React.useState<JournalEntry | null>(null)
+  const [originalNote, setOriginalNote] = React.useState<string>("") 
 
   // Load config
   React.useEffect(() => {
@@ -265,31 +268,81 @@ export function JournalTable() {
     }))
   }
 
+  const isEntryChanged = (dateStr: string): boolean => {
+    if (!originalEntry) return false
+    const entry = entries[dateStr]
+    if (!entry) return false
+    return (
+      entry.capital !== originalEntry.capital ||
+      entry.status !== originalEntry.status ||
+      entry.profit !== originalEntry.profit ||
+      entry.brokerage !== originalEntry.brokerage
+    )
+  }
+
+  const isNoteChanged = (weekKey: string): boolean => {
+    return (weekNotes[weekKey] || "") !== originalNote
+  }
+
   const toggleEdit = async (dateStr: string) => {
     if (editingRow === dateStr) {
-      setIsLoading(true)
-      try {
-        const entry = entries[dateStr]
-        if (entry) {
-          const payload: JournalEntryData = {
-            date: dateStr,
-            capital: entry.capital ? parseFloat(entry.capital) : null,
-            status: entry.status || null,
-            profit: entry.profit ? parseFloat(entry.profit) : null,
-            brokerage: entry.brokerage ? parseFloat(entry.brokerage) : null
+      const hasChanges = isEntryChanged(dateStr)
+      if (hasChanges) {
+        setIsLoading(true)
+        try {
+          const entry = entries[dateStr]
+          if (entry) {
+            const payload: JournalEntryData = {
+              date: dateStr,
+              capital: entry.capital ? parseFloat(entry.capital) : null,
+              status: entry.status || null,
+              profit: entry.profit ? parseFloat(entry.profit) : null,
+              brokerage: entry.brokerage ? parseFloat(entry.brokerage) : null
+            }
+            await journalService.upsertEntry(payload)
+            toast.success("Row saved")
           }
-          await journalService.upsertEntry(payload)
-          toast.success("Row saved")
+        } catch (e) {
+          console.error("Failed to save row", e)
+          toast.error("Failed to save row")
+        } finally {
+          setIsLoading(false)
         }
-        setEditingRow(null)
-      } catch (e) {
-        console.error("Failed to save row", e)
-        toast.error("Failed to save row")
-      } finally {
-        setIsLoading(false)
+      } else {
+        // Cancel - revert to original
+        if (originalEntry) {
+          setEntries(prev => ({ ...prev, [dateStr]: originalEntry }))
+        }
       }
+      setEditingRow(null)
+      setOriginalEntry(null)
     } else {
+      const entry = entries[dateStr] || { date: new Date(dateStr), capital: "", status: "", profit: "", brokerage: "" }
+      setOriginalEntry({ ...entry })
       setEditingRow(dateStr)
+    }
+  }
+
+  const toggleNoteEdit = async (weekKey: string, weekStart: Date) => {
+    if (editingNote === weekKey) {
+      const hasChanges = isNoteChanged(weekKey)
+      if (hasChanges) {
+        try {
+          await journalService.saveWeeklyNote(weekKey, weekStart, weekNotes[weekKey] || "")
+          toast.success("Note saved")
+        } catch (e) {
+          console.error("Failed to save note", e)
+          toast.error("Failed to save note")
+        }
+      } else {
+        // Cancel - revert to original
+        setWeekNotes(prev => ({ ...prev, [weekKey]: originalNote }))
+      }
+      setEditingNote(null)
+      setOriginalNote("")
+    } else {
+      setOriginalNote(weekNotes[weekKey] || "")
+      setEditingNote(weekKey)
     }
   }
 
@@ -346,7 +399,7 @@ export function JournalTable() {
                     </span>
                 </div>
                 <div className="flex flex-col items-center">
-                    <span className="text-sm font-medium text-muted-foreground uppercase text-[10px]">Brokerage</span>
+                    <span className="text-sm font-medium text-muted-foreground uppercase text-[10px]">Charges</span>
                      <span className="text-2xl font-bold">
                         {formatCurrency(monthlyTotals.totalBrokerage.toFixed(0))}
                     </span>
@@ -363,12 +416,12 @@ export function JournalTable() {
               <TableHead className="w-[120px] font-semibold text-muted-foreground h-10">Capital</TableHead>
               <TableHead className="w-[100px] font-semibold text-muted-foreground h-10">Capital 1%</TableHead>
               <TableHead className="w-[100px] font-semibold text-muted-foreground h-10">Target</TableHead>
-              <TableHead className="w-[120px] font-semibold text-muted-foreground h-10">Max Brokerage</TableHead>
+              <TableHead className="w-[120px] font-semibold text-muted-foreground h-10">Max Charges</TableHead>
               <TableHead className="w-[120px] font-semibold text-muted-foreground h-10">Max Stoploss</TableHead>
               <TableHead className="w-[180px] font-semibold text-muted-foreground h-10">Status</TableHead>
               <TableHead className="w-[100px] font-semibold text-muted-foreground h-10">Profit</TableHead>
-              <TableHead className="w-[100px] font-semibold text-muted-foreground h-10">Brokerage</TableHead>
-              <TableHead className="w-[100px] font-semibold text-muted-foreground h-10">Brokerage %</TableHead>
+              <TableHead className="w-[100px] font-semibold text-muted-foreground h-10">Charges</TableHead>
+              <TableHead className="w-[100px] font-semibold text-muted-foreground h-10">Charges %</TableHead>
               <TableHead className="w-[100px] font-semibold text-muted-foreground h-10">Profit %</TableHead>
               <TableHead className="w-[60px] font-semibold text-muted-foreground h-10"></TableHead>
             </TableRow>
@@ -477,13 +530,18 @@ export function JournalTable() {
                             variant="ghost" 
                             size="icon" 
                             className={cn(
-                              "h-6 w-6 opacity-0 group-hover:opacity-100 transition-none",
+                              "h-6 w-6 transition-none",
+                              !isEditing && "opacity-0 group-hover:opacity-100",
                               isLoading && "opacity-0 pointer-events-none"
                             )}
                             onClick={() => toggleEdit(dateStr)}
                             disabled={isLoading}
                         >
-                            {isEditing ? <Check className="h-3 w-3" /> : <Pencil className="h-3 w-3" />}
+                            {isEditing ? (
+                              isEntryChanged(dateStr) ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />
+                            ) : (
+                              <Pencil className="h-3 w-3" />
+                            )}
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -510,17 +568,40 @@ export function JournalTable() {
                          </div>
                       </div>
 
-                      <div className="flex flex-col space-y-2">
-                        <span className="text-xs font-semibold text-muted-foreground">
-                          Weekly Notes & Lessons ({format(weekDays[0], "MMM dd")} - {format(weekDays[weekDays.length - 1], "MMM dd")})
-                        </span>
-                        <Textarea 
-                          placeholder="Write your consolidated notes, emotions, and lessons for this week..." 
-                          className="min-h-[80px] resize-y bg-background"
-                          value={weekNotes[weekKey] || ""}
-                          onChange={(e) => setWeekNotes(prev => ({...prev, [weekKey]: e.target.value}))}
-                          onBlur={(e) => journalService.saveWeeklyNote(weekKey, weekDays[0], e.target.value)}
-                        />
+                      <div className="flex flex-col space-y-2 group">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-semibold text-muted-foreground">
+                            Weekly Notes & Lessons ({format(weekDays[0], "MMM dd")} - {format(weekDays[weekDays.length - 1], "MMM dd")})
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className={cn(
+                              "h-6 w-6 transition-none",
+                              editingNote !== weekKey && "opacity-0 group-hover:opacity-100"
+                            )}
+                            onClick={() => toggleNoteEdit(weekKey, weekDays[0])}
+                          >
+                            {editingNote === weekKey ? (
+                              isNoteChanged(weekKey) ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />
+                            ) : (
+                              <Pencil className="h-3 w-3" />
+                            )}
+                          </Button>
+                        </div>
+                        {editingNote === weekKey ? (
+                          <Textarea 
+                            placeholder="Write your consolidated notes, emotions, and lessons for this week..." 
+                            className="min-h-[80px] resize-y bg-background"
+                            value={weekNotes[weekKey] || ""}
+                            onChange={(e) => setWeekNotes(prev => ({...prev, [weekKey]: e.target.value}))}
+                            autoFocus
+                          />
+                        ) : (
+                          <div className="min-h-[40px] text-sm text-foreground whitespace-pre-wrap">
+                            {weekNotes[weekKey] || <span className="text-muted-foreground italic">No notes for this week</span>}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </TableCell>

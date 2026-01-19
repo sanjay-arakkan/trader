@@ -42,6 +42,19 @@ export const journalService = {
     return data
   },
 
+  async getAllEntries() {
+    const { data, error } = await supabase
+      .from('journal_entries')
+      .select('*')
+      .order('date', { ascending: true })
+
+    if (error) {
+      console.error('Error fetching all entries:', JSON.stringify(error, Object.getOwnPropertyNames(error)))
+      return []
+    }
+    return data
+  },
+
   async upsertEntry(entry: JournalEntryData) {
     // Get current user
     const { data: { user } } = await supabase.auth.getUser()
