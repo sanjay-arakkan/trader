@@ -23,7 +23,6 @@ import { Pencil, Check, ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { journalService, type JournalEntryData, type WeeklyNoteData } from "@/services/journal-service"
 import { toast } from "sonner"
-import { Skeleton } from "@/components/ui/skeleton"
 
 interface JournalEntry {
   date: Date
@@ -142,6 +141,18 @@ export function JournalTable() {
   }, [days, entries])
 
 
+
+  const formatCurrency = (value: number | string) => {
+    const num = typeof value === "string" ? parseFloat(value) : value
+    if (isNaN(num)) return ""
+    return new Intl.NumberFormat('en-IN', { 
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+      minimumFractionDigits: 0
+    }).format(num)
+  }
+
   const calculateValues = (day: Date, entry: JournalEntry | undefined) => {
     let projectedCapital = config.initialCapital
     if (config.startDate && config.initialCapital > 0) {
@@ -171,34 +182,42 @@ export function JournalTable() {
     const brokPercent = profit !== 0 ? (brokerage / profit) * 100 : 0
 
     return {
-      cap1: cap1 > 0 ? cap1.toFixed(0) : "",
-      target: target > 0 ? target.toFixed(0) : "",
-      maxSL: maxSL > 0 ? maxSL.toFixed(0) : "",
-      maxBrokerage: maxBrokerage > 0 ? maxBrokerage.toFixed(0) : "",
-      brokPercent: profit !== 0 ? brokPercent.toFixed(2) + "%" : "", 
-      profitPercent: manualCapital > 0 ? profitPercent.toFixed(2) + "%" : ""
+      cap1: cap1 > 0 ? formatCurrency(cap1.toFixed(0)) : "",
+      target: target > 0 ? formatCurrency(target.toFixed(0)) : "",
+      maxSL: maxSL > 0 ? formatCurrency(maxSL.toFixed(0)) : "",
+      maxBrokerage: maxBrokerage > 0 ? formatCurrency(maxBrokerage.toFixed(0)) : "",
+      brokPercent: brokerage === 0 ? "0.00%" : profit !== 0 ? brokPercent.toFixed(2) + "%" : "", 
+      profitPercent: manualCapital > 0 ? profitPercent.toFixed(2) + "%" : "",
+      isHighBrokerage: brokerage > maxBrokerage
     }
   }
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case "losing": return "bg-red-500"
-      case "target_failed": return "bg-orange-500"
-      case "market_holiday":
-      case "special_occasion": return "bg-gray-500"
-      case "target_achieved": return "bg-green-500"
-      default: return "bg-transparent"
-    }
+    if (!status) return "bg-transparent"
+    const lower = status.toLowerCase()
+    
+    if (lower === "losing" || lower === "losing day" || lower.includes("loss")) return "bg-red-500"
+    if (lower === "target_failed" || lower === "target failed") return "bg-orange-500"
+    if (lower === "market_holiday" || lower === "market holiday" || lower.includes("holiday")) return "bg-gray-500"
+    if (lower === "special_occasion" || lower === "special occasion") return "bg-gray-500"
+    if (lower === "no_trade" || lower === "no trade") return "bg-gray-500"
+    if (lower === "target_achieved" || lower === "target achieved" || lower.includes("profit") || lower.includes("win")) return "bg-green-500"
+    
+    return "bg-transparent"
   }
   
   const getStatusLabel = (status: string) => {
-       switch (status) {
+    if (!status) return ""
+    const lower = status.toLowerCase()
+    
+    switch (lower) {
       case "losing": return "Losing Day"
       case "target_failed": return "Target Failed"
       case "market_holiday": return "Market Holiday"
       case "special_occasion": return "Special Occasion"
+      case "no_trade": return "No Trade"
       case "target_achieved": return "Target Achieved"
-      default: return ""
+      default: return status // Return original string if no match
     }
   }
 
@@ -215,6 +234,20 @@ export function JournalTable() {
     })
     const realizedProfit = totalProfit - totalBrokerage
     return { realizedProfit, totalBrokerage }
+  }
+
+  const getNormalizedStatus = (status: string) => {
+    if (!status) return ""
+    const lower = status.toLowerCase()
+    
+    if (lower === "losing" || lower === "losing day" || lower.includes("loss")) return "losing"
+    if (lower === "target_failed" || lower === "target failed") return "target_failed"
+    if (lower === "market_holiday" || lower === "market holiday" || lower.includes("holiday")) return "market_holiday"
+    if (lower === "special_occasion" || lower === "special occasion") return "special_occasion"
+    if (lower === "no_trade" || lower === "no trade") return "no_trade"
+    if (lower === "target_achieved" || lower === "target achieved" || lower.includes("profit") || lower.includes("win")) return "target_achieved"
+    
+    return status
   }
 
   const handleInputChange = (dateStr: string, field: keyof JournalEntry, value: string) => {
@@ -297,18 +330,18 @@ export function JournalTable() {
             
             <div className="flex gap-8 px-4">
                 <div className="flex flex-col items-center">
-                    <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider text-[10px]">Realized Profit</span>
+                    <span className="text-sm font-medium text-muted-foreground uppercase text-[10px]">Realized Profit</span>
                     <span className={cn(
                         "text-2xl font-bold",
                         monthlyTotals.realizedProfit > 0 ? "text-green-600" : monthlyTotals.realizedProfit < 0 ? "text-red-600" : ""
                     )}>
-                        {monthlyTotals.realizedProfit.toFixed(0)}
+                        {formatCurrency(monthlyTotals.realizedProfit.toFixed(0))}
                     </span>
                 </div>
                 <div className="flex flex-col items-center">
-                    <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider text-[10px]">Brokerage</span>
+                    <span className="text-sm font-medium text-muted-foreground uppercase text-[10px]">Brokerage</span>
                      <span className="text-2xl font-bold">
-                        {monthlyTotals.totalBrokerage.toFixed(0)}
+                        {formatCurrency(monthlyTotals.totalBrokerage.toFixed(0))}
                     </span>
                 </div>
             </div>
@@ -319,40 +352,22 @@ export function JournalTable() {
         <table className="w-full caption-bottom text-sm text-left">
           <TableHeader className="sticky top-0 z-10 bg-background shadow-sm">
             <TableRow className="bg-muted/50 hover:bg-muted/50 border-b">
-              <TableHead className="w-[120px] pl-4 font-semibold text-muted-foreground h-10">Day</TableHead>
-              <TableHead className="font-semibold text-muted-foreground h-10">Capital</TableHead>
-              <TableHead className="font-semibold text-muted-foreground h-10">Capital 1%</TableHead>
-              <TableHead className="font-semibold text-muted-foreground h-10">Target</TableHead>
-              <TableHead className="font-semibold text-muted-foreground h-10">Max Brokerage</TableHead>
-              <TableHead className="font-semibold text-muted-foreground h-10">Max Stoploss</TableHead>
+              <TableHead className="w-[140px] pl-4 font-semibold text-muted-foreground h-10">Day</TableHead>
+              <TableHead className="w-[120px] font-semibold text-muted-foreground h-10">Capital</TableHead>
+              <TableHead className="w-[100px] font-semibold text-muted-foreground h-10">Capital 1%</TableHead>
+              <TableHead className="w-[100px] font-semibold text-muted-foreground h-10">Target</TableHead>
+              <TableHead className="w-[120px] font-semibold text-muted-foreground h-10">Max Brokerage</TableHead>
+              <TableHead className="w-[120px] font-semibold text-muted-foreground h-10">Max Stoploss</TableHead>
               <TableHead className="w-[180px] font-semibold text-muted-foreground h-10">Status</TableHead>
-              <TableHead className="font-semibold text-muted-foreground h-10">Profit</TableHead>
-              <TableHead className="font-semibold text-muted-foreground h-10">Brokerage</TableHead>
-              <TableHead className="font-semibold text-muted-foreground h-10">Brokerage %</TableHead>
-              <TableHead className="font-semibold text-muted-foreground h-10">Profit %</TableHead>
-              <TableHead className="w-[50px] font-semibold text-muted-foreground h-10"></TableHead>
+              <TableHead className="w-[100px] font-semibold text-muted-foreground h-10">Profit</TableHead>
+              <TableHead className="w-[100px] font-semibold text-muted-foreground h-10">Brokerage</TableHead>
+              <TableHead className="w-[100px] font-semibold text-muted-foreground h-10">Brokerage %</TableHead>
+              <TableHead className="w-[100px] font-semibold text-muted-foreground h-10">Profit %</TableHead>
+              <TableHead className="w-[60px] font-semibold text-muted-foreground h-10"></TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              Array.from({ length: 5 }).map((_, i) => (
-                <TableRow key={`skeleton-${i}`} className="border-b">
-                   <TableCell className="h-12 py-1"><Skeleton className="h-4 w-24" /></TableCell>
-                   <TableCell className="h-12 py-1"><Skeleton className="h-4 w-16" /></TableCell>
-                   <TableCell className="h-12 py-1"><Skeleton className="h-4 w-16" /></TableCell>
-                   <TableCell className="h-12 py-1"><Skeleton className="h-4 w-16" /></TableCell>
-                   <TableCell className="h-12 py-1"><Skeleton className="h-4 w-16" /></TableCell>
-                   <TableCell className="h-12 py-1"><Skeleton className="h-4 w-16" /></TableCell>
-                   <TableCell className="h-12 py-1"><Skeleton className="h-4 w-32" /></TableCell>
-                   <TableCell className="h-12 py-1"><Skeleton className="h-4 w-16" /></TableCell>
-                   <TableCell className="h-12 py-1"><Skeleton className="h-4 w-16" /></TableCell>
-                   <TableCell className="h-12 py-1"><Skeleton className="h-4 w-16" /></TableCell>
-                   <TableCell className="h-12 py-1"><Skeleton className="h-4 w-16" /></TableCell>
-                   <TableCell className="h-12 py-1"></TableCell>
-                </TableRow>
-              ))
-            ) : (
-             weeks.map(([weekKey, weekDays]) => {
+           <TableBody>
+            {weeks.map(([weekKey, weekDays]) => {
               const totals = getWeeklyTotals(weekDays)
               
               return (
@@ -377,20 +392,20 @@ export function JournalTable() {
                               type="number" 
                               value={entry.capital || ""}
                               onChange={(e) => handleInputChange(dateStr, 'capital', e.target.value)}
-                              className="w-24 h-8"
+                              className="w-full h-8"
                             />
                         ) : (
-                            <span className="text-foreground">{entry.capital}</span>
+                            <span className="text-foreground">{entry.capital ? formatCurrency(entry.capital) : ""}</span>
                         )}
                       </TableCell>
-                      <TableCell className="text-muted-foreground h-12 py-1">{calculated.cap1}</TableCell>
-                      <TableCell className="text-muted-foreground h-12 py-1">{calculated.target}</TableCell>
-                      <TableCell className="text-muted-foreground h-12 py-1">{calculated.maxBrokerage}</TableCell>
-                      <TableCell className="text-muted-foreground h-12 py-1">{calculated.maxSL}</TableCell>
+                      <TableCell className="h-12 py-1">{calculated.cap1}</TableCell>
+                      <TableCell className="h-12 py-1">{calculated.target}</TableCell>
+                      <TableCell className="h-12 py-1">{calculated.maxBrokerage}</TableCell>
+                      <TableCell className="h-12 py-1">{calculated.maxSL}</TableCell>
                       <TableCell className="h-12 py-1">
-                        {isEditing ? (
+                          {isEditing ? (
                             <Select 
-                              value={entry.status || ""} 
+                              value={getNormalizedStatus(entry.status || "")} 
                               onValueChange={(val) => handleInputChange(dateStr, 'status', val)}
                             >
                               <SelectTrigger className="w-[160px] h-8">
@@ -402,6 +417,7 @@ export function JournalTable() {
                                 <SelectItem value="target_failed">Target Failed</SelectItem>
                                 <SelectItem value="market_holiday">Market Holiday</SelectItem>
                                 <SelectItem value="special_occasion">Special Occasion</SelectItem>
+                                <SelectItem value="no_trade">No Trade</SelectItem>
                               </SelectContent>
                             </Select>
                         ) : (
@@ -417,7 +433,7 @@ export function JournalTable() {
                               className="w-24 h-8"
                             />
                          ) : (
-                            <span className="text-foreground">{entry.profit}</span>
+                            <span className="text-foreground font-bold">{entry.profit ? formatCurrency(entry.profit) : ""}</span>
                          )}
                       </TableCell>
                       <TableCell className="h-12 py-1">
@@ -429,10 +445,15 @@ export function JournalTable() {
                               className="w-24 h-8"
                             />
                         ) : (
-                            <span className="text-foreground">{entry.brokerage}</span>
+                            <span className={cn(
+                                "font-bold",
+                                calculated.isHighBrokerage ? "text-red-600" : "text-foreground"
+                            )}>
+                                {entry.brokerage ? formatCurrency(entry.brokerage) : ""}
+                            </span>
                         )}
                       </TableCell>
-                      <TableCell className="text-muted-foreground h-12 py-1">{calculated.brokPercent}</TableCell>
+                      <TableCell className="h-12 py-1">{calculated.brokPercent}</TableCell>
                       <TableCell className={cn(
                         "font-medium h-12 py-1",
                         parseFloat(entry.profit) - parseFloat(entry.brokerage) > 0 ? "text-green-600" : parseFloat(entry.profit) - parseFloat(entry.brokerage) < 0 ? "text-red-600" : ""
@@ -466,19 +487,19 @@ export function JournalTable() {
                              "font-bold",
                              totals.realizedProfit > 0 ? "text-green-600" : totals.realizedProfit < 0 ? "text-red-600" : ""
                            )}>
-                             {totals.realizedProfit.toFixed(0)}
+                             {formatCurrency(totals.realizedProfit.toFixed(0))}
                            </span>
                          </div>
                          <div className="flex items-center gap-2">
                            <span className="text-muted-foreground font-medium">Brokerage:</span>
                            <span className="font-bold text-foreground">
-                             {totals.totalBrokerage.toFixed(0)}
+                             {formatCurrency(totals.totalBrokerage.toFixed(0))}
                            </span>
                          </div>
                       </div>
 
                       <div className="flex flex-col space-y-2">
-                        <span className="text-xs font-semibold text-muted-foreground tracking-wider">
+                        <span className="text-xs font-semibold text-muted-foreground">
                           Weekly Notes & Lessons ({format(weekDays[0], "MMM dd")} - {format(weekDays[weekDays.length - 1], "MMM dd")})
                         </span>
                         <Textarea 
@@ -494,8 +515,7 @@ export function JournalTable() {
                 </TableRow>
                 <TableRow className="h-4 bg-transparent border-none hover:bg-transparent pointer-events-none"><TableCell colSpan={12}></TableCell></TableRow>
               </React.Fragment>
-            )
-            }))}
+              )})}
           </TableBody>
         </table>
       </div>
