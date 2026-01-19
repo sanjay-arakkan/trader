@@ -9,7 +9,7 @@ import {
   Lightbulb,
   Settings,
   LogOut,
-  TrendingUp,
+  Activity,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -57,7 +57,7 @@ export function Sidebar({ userName }: SidebarProps) {
       {/* Logo/Brand */}
       <div className="flex h-16 items-center gap-2 border-b border-border px-6">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-          <TrendingUp className="h-5 w-5 text-primary-foreground" />
+          <Activity className="h-5 w-5 text-primary-foreground" />
         </div>
         <span className="text-lg font-semibold text-sidebar-foreground">
           Trader

@@ -1,13 +1,25 @@
 "use client"
 
+import * as React from "react"
 import { useTheme } from "next-themes"
 import { Settings, Sun, Moon, Monitor } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = React.useState(false)
+
+  // Avoid hydration mismatch by only rendering after mount
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return null
+  }
 
   return (
     <div className="p-6 lg:p-8">
@@ -19,6 +31,26 @@ export default function SettingsPage() {
       </div>
 
       <div className="max-w-2xl space-y-6">
+        {/* Trading Configuration */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                <Settings className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">Trading Configuration</CardTitle>
+                <CardDescription>
+                  Set your initial capital and starting date for projections
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <ConfigurationForm />
+          </CardContent>
+        </Card>
+
         {/* Appearance Settings */}
         <Card>
           <CardHeader>
@@ -69,17 +101,69 @@ export default function SettingsPage() {
             </div>
           </CardContent>
         </Card>
-
-        {/* Account Info - Future placeholder */}
-        <Card className="border-dashed">
-          <CardHeader>
-            <CardTitle className="text-lg">Account Settings</CardTitle>
-            <CardDescription>
-              Additional account settings will be available here soon
-            </CardDescription>
-          </CardHeader>
-        </Card>
       </div>
+    </div>
+  )
+}
+
+import { toast } from "sonner"
+
+function ConfigurationForm() {
+  const [initialCapital, setInitialCapital] = React.useState("")
+  const [startDate, setStartDate] = React.useState("")
+  const [savedConfig, setSavedConfig] = React.useState({ initialCapital: "", startDate: "" })
+
+  React.useEffect(() => {
+    const configStr = localStorage.getItem("trader_config")
+    if (configStr) {
+      const config = JSON.parse(configStr)
+      const initialCapital = config.initialCapital || ""
+      const startDate = config.startDate || ""
+      setInitialCapital(initialCapital)
+      setStartDate(startDate)
+      setSavedConfig({ initialCapital, startDate })
+    }
+  }, [])
+
+  const hasChanges = initialCapital !== savedConfig.initialCapital || startDate !== savedConfig.startDate
+
+  const handleSave = () => {
+    const newConfig = { initialCapital, startDate }
+    localStorage.setItem("trader_config", JSON.stringify(newConfig))
+    setSavedConfig(newConfig)
+    toast.success("Configuration saved successfully!")
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="capital">Initial Capital</Label>
+          <Input 
+            id="capital"
+            type="number" 
+            placeholder="e.g. 100000" 
+            value={initialCapital}
+            onChange={(e) => setInitialCapital(e.target.value)}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="start-date">Starting Date</Label>
+          <Input 
+            id="start-date"
+            type="date" 
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
+        </div>
+      </div>
+      <Button 
+        onClick={handleSave} 
+        disabled={!hasChanges}
+        className="w-full md:w-auto"
+      >
+        Save Configuration
+      </Button>
     </div>
   )
 }
