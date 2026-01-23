@@ -14,7 +14,9 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetTitle } from "@/components/ui/sheet"
+
+import { useDailyQuote } from "@/hooks/use-daily-quote"
 
 interface SidebarProps {
   userName: string
@@ -48,6 +50,7 @@ function SidebarContent({ userName, mobile }: { userName: string; mobile?: boole
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
+  const dailyQuote = useDailyQuote()
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -58,13 +61,20 @@ function SidebarContent({ userName, mobile }: { userName: string; mobile?: boole
   return (
     <div className="flex h-full flex-col bg-sidebar">
       {/* Logo/Brand */}
-      <div className="flex h-16 items-center gap-2 border-b border-border px-6">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-          <Activity className="h-5 w-5 text-primary-foreground" />
+      <div className="flex flex-col border-b border-border px-6 py-4">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+            <Activity className="h-5 w-5 text-primary-foreground" />
+          </div>
+          <span className="text-lg font-semibold text-sidebar-foreground">
+            Trader
+          </span>
         </div>
-        <span className="text-lg font-semibold text-sidebar-foreground">
-          Trader
-        </span>
+        {dailyQuote && (
+          <p className="text-xs text-muted-foreground italic leading-relaxed">
+            &quot;{dailyQuote}&quot;
+          </p>
+        )}
       </div>
 
       {/* Navigation */}
@@ -132,6 +142,7 @@ export function Sidebar({ userName }: SidebarProps) {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="p-0 w-72">
+            <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
             <SidebarContent userName={userName} mobile />
           </SheetContent>
         </Sheet>
