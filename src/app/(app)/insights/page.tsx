@@ -49,7 +49,7 @@ type WeeklySummary = {
 // Reusable Custom Tooltip Component
 const CustomTooltip = ({ active, payload, label, prefix = "", suffix = "", colorClass = "text-foreground" }: {
   active?: boolean
-  payload?: { value: number }[]
+  payload?: any
   label?: string | number
   prefix?: string
   suffix?: string
