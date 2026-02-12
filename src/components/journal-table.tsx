@@ -374,7 +374,7 @@ export function JournalTable() {
               brokerage: entry.brokerage ? parseFloat(entry.brokerage) : null,
             };
             await journalService.upsertEntry(payload);
-            toast.success("Row saved");
+            toast.success("Journal saved");
           }
         } catch (e) {
           console.error("Failed to save row", e);
