@@ -8,6 +8,9 @@ export type JournalEntryData = {
   status: string | null
   profit: number | null
   brokerage: number | null
+  opt_oi: string | null
+  fut_oi: string | null
+  sl: string | null
 }
 
 export type WeeklyNoteData = {

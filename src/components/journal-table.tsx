@@ -47,6 +47,9 @@ interface JournalEntry {
   status: string;
   profit: string;
   brokerage: string;
+  opt_oi: string;
+  fut_oi: string;
+  sl: string;
 }
 
 interface Config {
@@ -115,6 +118,9 @@ export function JournalTable() {
             status: e.status || "",
             profit: e.profit?.toString() || "",
             brokerage: e.brokerage?.toString() || "",
+            opt_oi: e.opt_oi || "",
+            fut_oi: e.fut_oi || "",
+            sl: e.sl || "",
           };
         });
         setEntries((prev) => ({ ...prev, ...newEntries }));
@@ -350,7 +356,10 @@ export function JournalTable() {
       entry.capital !== originalEntry.capital ||
       entry.status !== originalEntry.status ||
       entry.profit !== originalEntry.profit ||
-      entry.brokerage !== originalEntry.brokerage
+      entry.brokerage !== originalEntry.brokerage ||
+      entry.opt_oi !== originalEntry.opt_oi ||
+      entry.fut_oi !== originalEntry.fut_oi ||
+      entry.sl !== originalEntry.sl
     );
   };
 
@@ -372,6 +381,9 @@ export function JournalTable() {
               status: entry.status || null,
               profit: entry.profit ? parseFloat(entry.profit) : null,
               brokerage: entry.brokerage ? parseFloat(entry.brokerage) : null,
+              opt_oi: entry.opt_oi || null,
+              fut_oi: entry.fut_oi || null,
+              sl: entry.sl || null,
             };
             await journalService.upsertEntry(payload);
             toast.success("Journal saved");
@@ -397,6 +409,9 @@ export function JournalTable() {
         status: "",
         profit: "",
         brokerage: "",
+        opt_oi: "",
+        fut_oi: "",
+        sl: "",
       };
       setOriginalEntry({ ...entry });
       setEditingRow(dateStr);
@@ -513,6 +528,15 @@ export function JournalTable() {
               <TableHead className="w-[140px] pl-4 font-semibold text-muted-foreground h-10">
                 Day
               </TableHead>
+              <TableHead className="w-[120px] font-semibold text-muted-foreground h-10 text-xs">
+                Option OI
+              </TableHead>
+              <TableHead className="w-[120px] font-semibold text-muted-foreground h-10 text-xs">
+                Futures OI
+              </TableHead>
+              <TableHead className="w-[120px] font-semibold text-muted-foreground h-10 text-xs">
+                SL Hunting
+              </TableHead>
               <TableHead className="w-[120px] font-semibold text-muted-foreground h-10">
                 Capital
               </TableHead>
@@ -560,6 +584,9 @@ export function JournalTable() {
                       status: "",
                       profit: "",
                       brokerage: "",
+                      opt_oi: "",
+                      fut_oi: "",
+                      sl: "",
                     };
                     const calculated = calculateValues(day, entry);
                     const statusColor = getStatusColor(entry.status || "");
@@ -585,6 +612,50 @@ export function JournalTable() {
                           />
                           {format(day, "EEE, dd MMM")}
                         </TableCell>
+                        {(["opt_oi", "fut_oi", "sl"] as const).map((field) => {
+                          const val = entry[field] || "";
+                          return (
+                            <TableCell key={field} className="h-12 py-1">
+                              {isEditing ? (
+                                <Select
+                                  value={val}
+                                  onValueChange={(v) =>
+                                    handleInputChange(dateStr, field, v === "_empty" ? "" : v)
+                                  }
+                                >
+                                  <SelectTrigger className="w-[110px] h-8">
+                                    <SelectValue placeholder="-" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="_empty">
+                                      -
+                                    </SelectItem>
+                                    <SelectItem value="positive">
+                                      Positive
+                                    </SelectItem>
+                                    <SelectItem value="negative">
+                                      Negative
+                                    </SelectItem>
+                                    <SelectItem value="indecisive">
+                                      Indecisive
+                                    </SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              ) : (
+                                <span
+                                  className={cn(
+                                    "font-bold",
+                                    val === "positive" && "text-green-600",
+                                    val === "negative" && "text-red-600",
+                                    val === "indecisive" && "text-foreground",
+                                  )}
+                                >
+                                  {val === "positive" ? "Positive" : val === "negative" ? "Negative" : val === "indecisive" ? "Indecisive" : ""}
+                                </span>
+                              )}
+                            </TableCell>
+                          );
+                        })}
                         <TableCell className="h-12 py-1">
                           {isEditing ? (
                             <Input
@@ -761,7 +832,7 @@ export function JournalTable() {
                     );
                   })}
                   <TableRow className="bg-muted/30 hover:bg-muted/30">
-                    <TableCell colSpan={12} className="p-4">
+                    <TableCell colSpan={15} className="p-4">
                       <div className="flex flex-col gap-4">
                         <div className="flex items-center gap-6 text-sm">
                           <div className="flex items-center gap-2">
@@ -848,7 +919,7 @@ export function JournalTable() {
                     </TableCell>
                   </TableRow>
                   <TableRow className="h-4 bg-transparent border-none hover:bg-transparent pointer-events-none">
-                    <TableCell colSpan={12}></TableCell>
+                    <TableCell colSpan={15}></TableCell>
                   </TableRow>
                 </React.Fragment>
               );
