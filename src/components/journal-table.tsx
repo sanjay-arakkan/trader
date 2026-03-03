@@ -528,13 +528,13 @@ export function JournalTable() {
               <TableHead className="w-[140px] pl-4 font-semibold text-muted-foreground h-10">
                 Day
               </TableHead>
-              <TableHead className="w-[120px] font-semibold text-muted-foreground h-10 text-xs">
+              <TableHead className="w-[70px] font-semibold text-muted-foreground h-10 text-xs">
                 Option OI
               </TableHead>
-              <TableHead className="w-[120px] font-semibold text-muted-foreground h-10 text-xs">
+              <TableHead className="w-[70px] font-semibold text-muted-foreground h-10 text-xs">
                 Futures OI
               </TableHead>
-              <TableHead className="w-[120px] font-semibold text-muted-foreground h-10 text-xs">
+              <TableHead className="w-[70px] font-semibold text-muted-foreground h-10 text-xs">
                 SL Hunting
               </TableHead>
               <TableHead className="w-[120px] font-semibold text-muted-foreground h-10">
@@ -623,7 +623,7 @@ export function JournalTable() {
                                     handleInputChange(dateStr, field, v === "_empty" ? "" : v)
                                   }
                                 >
-                                  <SelectTrigger className="w-[110px] h-8">
+                                  <SelectTrigger className="w-[90px] h-8">
                                     <SelectValue placeholder="-" />
                                   </SelectTrigger>
                                   <SelectContent>
