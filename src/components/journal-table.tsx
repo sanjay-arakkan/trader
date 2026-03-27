@@ -540,9 +540,9 @@ export function JournalTable() {
               <TableHead className="w-[120px] font-semibold text-muted-foreground h-10">
                 Capital
               </TableHead>
-              <TableHead className="w-[100px] font-semibold text-muted-foreground h-10">
+              {/* <TableHead className="w-[100px] font-semibold text-muted-foreground h-10">
                 Capital 1%
-              </TableHead>
+              </TableHead> */}
               <TableHead className="w-[100px] font-semibold text-muted-foreground h-10">
                 Target
               </TableHead>
@@ -678,9 +678,9 @@ export function JournalTable() {
                             </span>
                           )}
                         </TableCell>
-                        <TableCell className="h-12 py-1">
+                        {/* <TableCell className="h-12 py-1">
                           {calculated.cap1}
-                        </TableCell>
+                        </TableCell> */}
                         <TableCell className="h-12 py-1">
                           {calculated.target}
                         </TableCell>
