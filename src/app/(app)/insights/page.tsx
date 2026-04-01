@@ -96,7 +96,10 @@ export default function InsightsPage() {
 
   // Transform data for charts
   const chartData: ChartEntry[] = React.useMemo(() => {
-    return entries.map(e => ({
+    const todayStr = format(new Date(), "yyyy-MM-dd");
+    return entries
+      .filter(e => e.date <= todayStr)
+      .map(e => ({
       date: e.date,
       displayDate: format(parseISO(e.date), "MMM dd"),
       capital: e.capital || 0,
@@ -119,8 +122,10 @@ export default function InsightsPage() {
   // Monthly summary
   const monthlySummary: MonthlySummary[] = React.useMemo(() => {
     const monthMap: Record<string, MonthlySummary> = {}
+    const thisMonthStr = format(new Date(), "yyyy-MM");
     entries.forEach(e => {
       const monthKey = e.date.substring(0, 7) // YYYY-MM
+      if (monthKey > thisMonthStr) return; // Filter future months
       if (!monthMap[monthKey]) {
         monthMap[monthKey] = {
           month: monthKey,
@@ -140,9 +145,12 @@ export default function InsightsPage() {
   // Weekly summary
   const weeklySummary: WeeklySummary[] = React.useMemo(() => {
     const weekMap: Record<string, WeeklySummary> = {}
+    const today = new Date();
+    const currentWeekKey = `${getISOWeekYear(today)}-W${getISOWeek(today).toString().padStart(2, '0')}`;
     entries.forEach(e => {
       const date = parseISO(e.date)
       const weekKey = `${getISOWeekYear(date)}-W${getISOWeek(date).toString().padStart(2, '0')}`
+      if (weekKey > currentWeekKey) return; // Filter future weeks
       if (!weekMap[weekKey]) {
         weekMap[weekKey] = {
           week: weekKey,
