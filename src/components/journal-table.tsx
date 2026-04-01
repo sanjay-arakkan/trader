@@ -211,7 +211,7 @@ export function JournalTable() {
     const manualCapital = isNaN(rawCapital) ? 0 : rawCapital;
     const profit = isNaN(rawProfit) ? 0 : rawProfit;
     const brokerage = isNaN(rawBrokerage) ? 0 : rawBrokerage;
-    const target = manualCapital > 0 ? manualCapital * 0.02 : 0;
+    const target = manualCapital > 0 ? manualCapital * 0.01 : 0;
     const maxSL = manualCapital > 0 ? manualCapital * 0.02 : 0;
     const maxBrokerage = manualCapital > 0 ? manualCapital * 0.002 : 0;
     const netProfit = profit - brokerage;
@@ -679,7 +679,7 @@ export function JournalTable() {
                           {calculated.cap1}
                         </TableCell> */}
                         <TableCell className="h-12 py-1">
-                          {calculated.target}
+                          {calculated.target} / {calculated.maxSL}
                         </TableCell>
                         <TableCell className="h-12 py-1">
                           {calculated.maxBrokerage}
