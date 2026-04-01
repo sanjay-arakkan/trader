@@ -544,7 +544,10 @@ export function JournalTable() {
                 Capital 1%
               </TableHead> */}
               <TableHead className="w-[100px] font-semibold text-muted-foreground h-10">
-                Target / Stoploss
+                Target
+              </TableHead>
+              <TableHead className="w-[100px] font-semibold text-muted-foreground h-10">
+                Stoploss
               </TableHead>
               <TableHead className="w-[120px] font-semibold text-muted-foreground h-10">
                 Max Charges
@@ -679,7 +682,10 @@ export function JournalTable() {
                           {calculated.cap1}
                         </TableCell> */}
                         <TableCell className="h-12 py-1">
-                          {calculated.target} / {calculated.maxSL}
+                          {calculated.target} 
+                        </TableCell>
+                        <TableCell className="h-12 py-1">
+                          {calculated.maxSL} 
                         </TableCell>
                         <TableCell className="h-12 py-1">
                           {calculated.maxBrokerage}
