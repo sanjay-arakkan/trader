@@ -23,6 +23,7 @@ export type UserSettings = {
   theme?: string
   initial_capital?: number
   start_date?: string
+  plan?: string
 }
 
 const supabase = createClient()
@@ -166,5 +167,14 @@ export const journalService = {
       throw error
     }
     return data
+  },
+
+  async getPlan(): Promise<string> {
+    const settings = await this.getSettings()
+    return settings?.plan || ""
+  },
+
+  async savePlan(content: string) {
+    return this.updateSettings({ plan: content })
   }
 }

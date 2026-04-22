@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import {
-  LineChart,
+  ClipboardList,
   BookOpen,
   Lightbulb,
   Settings,
@@ -24,9 +24,9 @@ interface SidebarProps {
 
 const navItems = [
   {
-    name: "Trades",
-    href: "/trades",
-    icon: LineChart,
+    name: "Plan",
+    href: "/plan",
+    icon: ClipboardList,
   },
   {
     name: "Journal",

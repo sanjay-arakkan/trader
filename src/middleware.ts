@@ -63,7 +63,7 @@ export async function middleware(request: NextRequest) {
   // If logged in and on login page, redirect to home
   if (user && isLoginPage) {
     const url = request.nextUrl.clone()
-    url.pathname = '/trades'
+    url.pathname = '/plan'
     return NextResponse.redirect(url)
   }
 

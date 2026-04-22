@@ -62,7 +62,7 @@ function LoginForm() {
       toast.success("Welcome back!", {
         description: "You have been signed in successfully.",
       })
-      router.push("/trades")
+      router.push("/plan")
       router.refresh()
     }
   }
@@ -100,7 +100,7 @@ function LoginForm() {
       toast.success("Account created!", {
         description: `Welcome ${firstName}! Your account has been created successfully.`,
       })
-      router.push("/trades")
+      router.push("/plan")
       router.refresh()
     }
   }
