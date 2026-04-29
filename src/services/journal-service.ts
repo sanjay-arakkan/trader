@@ -64,8 +64,8 @@ export const journalService = {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return null
 
-    // ID is date without dashes: 2026-01-19 -> 20260119
-    const id = entry.date.replace(/-/g, '')
+    // ID is user_id + date without dashes to ensure global uniqueness
+    const id = `${user.id}_${entry.date.replace(/-/g, '')}`
 
     const payload = {
       ...entry,
@@ -106,7 +106,7 @@ export const journalService = {
      const { data: { user } } = await supabase.auth.getUser()
      if (!user) return null
 
-     const id = format(mondayDate, "yyyyMMdd")
+     const id = `${user.id}_${format(mondayDate, "yyyyMMdd")}`
 
      const payload = {
          id,
