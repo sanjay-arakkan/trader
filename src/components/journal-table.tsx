@@ -57,7 +57,12 @@ interface Config {
   startDate: Date | null;
 }
 
-export function JournalTable() {
+interface JournalTableProps {
+  currentMonth?: Date;
+  onMonthChange?: (month: Date) => void;
+}
+
+export function JournalTable({ currentMonth: controlledMonth, onMonthChange }: JournalTableProps = {}) {
   const [entries, setEntries] = React.useState<Record<string, JournalEntry>>(
     {},
   );
@@ -68,7 +73,12 @@ export function JournalTable() {
   });
   const [editingRow, setEditingRow] = React.useState<string | null>(null);
   const [editingNote, setEditingNote] = React.useState<string | null>(null);
-  const [currentMonth, setCurrentMonth] = React.useState(new Date());
+  const [internalMonth, setInternalMonth] = React.useState(new Date());
+  const currentMonth = controlledMonth ?? internalMonth;
+  const setCurrentMonth = React.useCallback((month: Date) => {
+    setInternalMonth(month);
+    onMonthChange?.(month);
+  }, [onMonthChange]);
   const [isLoading, setIsLoading] = React.useState(false);
   const [originalEntry, setOriginalEntry] = React.useState<JournalEntry | null>(
     null,
@@ -459,11 +469,11 @@ export function JournalTable() {
         return;
       }
     }
-    setCurrentMonth((prev) => subMonths(prev, 1));
+    setCurrentMonth(subMonths(currentMonth, 1));
   };
   const handleNextMonth = () => {
     setIsLoading(true);
-    setCurrentMonth((prev) => addMonths(prev, 1));
+    setCurrentMonth(addMonths(currentMonth, 1));
   };
 
   return (

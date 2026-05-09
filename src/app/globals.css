@@ -309,6 +309,14 @@
   outline: none !important;
 }
 
+.recharts-cartesian-axis-tick-value,
+.recharts-cartesian-axis-tick text,
+.recharts-xAxis .recharts-cartesian-axis-tick-value,
+.recharts-yAxis .recharts-cartesian-axis-tick-value {
+  font-size: 12px !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+}
+
 /* ============================================
    Prose — iOS Typography Hierarchy
    ============================================ */
