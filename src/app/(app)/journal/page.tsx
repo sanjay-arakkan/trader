@@ -3,7 +3,7 @@
 import * as React from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-import { Pencil, Save, ClipboardList, X, TrendingUp } from "lucide-react"
+import { Pencil, Save, ClipboardList, X, TrendingUp, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { journalService } from "@/services/journal-service"
@@ -127,15 +127,18 @@ function CumulativePnLCard({ selectedMonth }: { selectedMonth: Date }) {
     }).format(v)
 
   return (
-    <Card
-      className="relative flex h-full flex-1 flex-col overflow-hidden border-none text-white ios-shadow-lg"
+    <div
+      className="relative flex h-full flex-1 flex-col overflow-hidden rounded-[16px] ios-shadow-lg"
       style={{
         background: isPositive
-          ? "linear-gradient(135deg, #15803d 0%, #166534 100%)"
+          ? "url('/images/green.avif') center/cover no-repeat"
           : "linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%)",
       }}
     >
-      <CardContent className="flex flex-1 flex-col p-5">
+      <Card
+        className="relative flex h-full flex-1 flex-col overflow-hidden rounded-[16px] border border-white/20 bg-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)] backdrop-blur-md text-white"
+      >
+        <CardContent className="flex flex-1 flex-col p-5">
         {/* Header */}
         <div className="mb-4 flex items-start justify-between">
           <div>
@@ -234,8 +237,9 @@ function CumulativePnLCard({ selectedMonth }: { selectedMonth: Date }) {
             </ResponsiveContainer>
           )}
         </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   )
 }
 
@@ -302,55 +306,69 @@ export default function JournalPage() {
       <div className="mb-6 flex flex-col gap-4 md:flex-row">
 
         {/* Plan Card — 50% on desktop */}
-        <div className="flex w-full flex-col md:w-1/2">
+        <div className="flex h-[320px] w-full flex-col md:w-1/2">
           {isPlanLoading ? (
-            <Card
-              className="group relative flex h-full min-h-[220px] flex-col overflow-hidden border-none text-white ios-shadow-lg"
+            <div
+              className="relative flex h-full min-h-[220px] flex-col overflow-hidden rounded-[16px] ios-shadow-lg"
               style={{
                 backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Crect x='60' y='60' width='40' height='60' fill='none' stroke='rgba(255,255,255,0.2)' stroke-width='2'/%3E%3Crect x='70' y='40' width='30' height='20' fill='none' stroke='rgba(255,255,255,0.2)' stroke-width='2'/%3E%3Crect x='40' y='80' width='20' height='40' fill='none' stroke='rgba(255,255,255,0.15)' stroke-width='2'/%3E%3Crect x='100' y='70' width='20' height='50' fill='none' stroke='rgba(255,255,255,0.15)' stroke-width='2'/%3E%3Crect x='80' y='80' width='10' height='10' fill='rgba(255,255,255,0.2)'/%3E%3Crect x='50' y='90' width='10' height='10' fill='rgba(255,255,255,0.15)'/%3E%3Crect x='110' y='90' width='10' height='10' fill='rgba(255,255,255,0.15)'/%3E%3C/svg%3E"), linear-gradient(135deg, #60A5FA 0%, #2563EB 100%)`,
                 backgroundPosition: "bottom right, center",
                 backgroundRepeat: "no-repeat, no-repeat",
               }}
             >
-              <CardContent className="relative z-10 flex flex-1 flex-col p-5 lg:p-6 justify-center space-y-4">
-                <div className="h-6 w-3/4 animate-pulse rounded-md bg-white/20"></div>
-                <div className="h-4 w-full animate-pulse rounded-md bg-white/20"></div>
-                <div className="h-4 w-5/6 animate-pulse rounded-md bg-white/20"></div>
-                <div className="h-4 w-2/3 animate-pulse rounded-md bg-white/20"></div>
-              </CardContent>
-            </Card>
+              <Card className="relative z-10 flex h-full flex-1 flex-col overflow-hidden rounded-[16px] border border-white/20 bg-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)] backdrop-blur-md">
+                <CardContent className="flex flex-1 flex-col justify-center space-y-4 p-5 lg:p-6">
+                  <div className="h-6 w-3/4 animate-pulse rounded-md bg-white/20"></div>
+                  <div className="h-4 w-full animate-pulse rounded-md bg-white/20"></div>
+                  <div className="h-4 w-5/6 animate-pulse rounded-md bg-white/20"></div>
+                  <div className="h-4 w-2/3 animate-pulse rounded-md bg-white/20"></div>
+                </CardContent>
+              </Card>
+            </div>
           ) : isEditing ? (
-            <Card className="flex h-full flex-col">
-              <CardContent className="flex h-full flex-col p-5">
-                <div className="mb-3 flex justify-end gap-2">
-                  <Button variant="secondary" size="sm" onClick={handleCancel} disabled={isSaving}>
-                    <X className="mr-1.5 h-4 w-4" />
-                    Cancel
-                  </Button>
-                  <Button size="sm" onClick={handleSave} disabled={isSaving}>
-                    <Save className="mr-1.5 h-4 w-4" />
-                    {isSaving ? "Saving..." : "Save"}
-                  </Button>
-                </div>
+            <div
+              className="relative flex h-full flex-col overflow-hidden rounded-[16px] ios-shadow-lg"
+              style={{
+                backgroundImage: `linear-gradient(135deg, #60A5FA 0%, #2563EB 100%)`,
+              }}
+            >
+              <Card className="relative flex h-full flex-col overflow-hidden rounded-[16px] border border-white/20 bg-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)] backdrop-blur-md">
+              <button
+                onClick={draftContent !== planContent ? handleSave : handleCancel}
+                disabled={isSaving}
+                className="absolute right-4 top-4 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-secondary text-secondary-foreground transition-all duration-200 hover:bg-secondary/80 disabled:opacity-50"
+                aria-label={draftContent !== planContent ? "Save plan" : "Cancel edit"}
+              >
+                {draftContent !== planContent ? (
+                  <Check className="h-4 w-4" />
+                ) : (
+                  <X className="h-4 w-4" />
+                )}
+              </button>
+              <CardContent className="flex h-full flex-1 flex-col p-0">
                 <textarea
                   id="plan-editor"
-                  className="w-full flex-1 resize-none rounded-[10px] border border-border bg-background p-4 font-mono text-[14px] text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30"
+                  className="w-full flex-1 resize-none border-none bg-transparent p-5 pt-14 font-mono text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none"
                   value={draftContent}
                   onChange={(e) => setDraftContent(e.target.value)}
                   placeholder={"Write your trading plan using Markdown...\n\n# My Trading Plan\n\n## Rules\n- Rule 1\n- Rule 2\n\n## Strategy\nDescribe your strategy here..."}
                   autoFocus
                 />
               </CardContent>
-            </Card>
+              </Card>
+            </div>
           ) : (
-            <Card
-              className="group relative flex h-full flex-col overflow-hidden border-none text-white ios-shadow-lg"
+            <div
+              className="group relative flex h-full flex-col overflow-hidden rounded-[16px] ios-shadow-lg"
               style={{
                 backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Crect x='60' y='60' width='40' height='60' fill='none' stroke='rgba(255,255,255,0.2)' stroke-width='2'/%3E%3Crect x='70' y='40' width='30' height='20' fill='none' stroke='rgba(255,255,255,0.2)' stroke-width='2'/%3E%3Crect x='40' y='80' width='20' height='40' fill='none' stroke='rgba(255,255,255,0.15)' stroke-width='2'/%3E%3Crect x='100' y='70' width='20' height='50' fill='none' stroke='rgba(255,255,255,0.15)' stroke-width='2'/%3E%3Crect x='80' y='80' width='10' height='10' fill='rgba(255,255,255,0.2)'/%3E%3Crect x='50' y='90' width='10' height='10' fill='rgba(255,255,255,0.15)'/%3E%3Crect x='110' y='90' width='10' height='10' fill='rgba(255,255,255,0.15)'/%3E%3C/svg%3E"), linear-gradient(135deg, #60A5FA 0%, #2563EB 100%)`,
                 backgroundPosition: "bottom right, center",
                 backgroundRepeat: "no-repeat, no-repeat",
               }}
             >
+              <Card
+                className="relative flex h-full flex-col overflow-hidden rounded-[16px] border border-white/20 bg-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)] backdrop-blur-md text-white"
+              >
               <button
                 onClick={handleEdit}
                 className="absolute right-4 top-4 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white opacity-0 transition-all duration-200 hover:bg-white/30 group-hover:opacity-100"
@@ -358,7 +376,7 @@ export default function JournalPage() {
               >
                 <Pencil className="h-3.5 w-3.5" />
               </button>
-              <CardContent className="relative z-10 flex flex-1 flex-col p-5 lg:p-6">
+              <CardContent className="relative z-10 flex flex-1 flex-col overflow-y-auto p-5 lg:p-6">
                 {planContent ? (
                   <div className="prose prose-invert max-w-none [&_*]:border-white/20 [&_*]:text-white">
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>{planContent}</ReactMarkdown>
@@ -380,11 +398,12 @@ export default function JournalPage() {
                 )}
               </CardContent>
             </Card>
+          </div>
           )}
         </div>
 
         {/* P&L Chart Card — 50% on desktop */}
-        <div className="flex min-h-[220px] w-full flex-col md:w-1/2">
+        <div className="flex h-[320px] w-full flex-col md:w-1/2">
           <CumulativePnLCard selectedMonth={currentMonth} />
         </div>
       </div>
