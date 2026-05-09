@@ -4,17 +4,14 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import {
-  ClipboardList,
   BookOpen,
   Lightbulb,
   Settings,
   LogOut,
   Activity,
-  Menu,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetTitle } from "@/components/ui/sheet"
 
 import { useDailyQuote } from "@/hooks/use-daily-quote"
 
@@ -23,11 +20,6 @@ interface SidebarProps {
 }
 
 const navItems = [
-  {
-    name: "Plan",
-    href: "/plan",
-    icon: ClipboardList,
-  },
   {
     name: "Journal",
     href: "/journal",
@@ -46,7 +38,7 @@ const navItems = [
 ]
 
 
-function SidebarContent({ userName, mobile }: { userName: string; mobile?: boolean }) {
+function DesktopSidebar({ userName }: { userName: string }) {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
@@ -59,105 +51,108 @@ function SidebarContent({ userName, mobile }: { userName: string; mobile?: boole
   }
 
   return (
-    <div className="flex h-full flex-col bg-sidebar">
-      {/* Logo/Brand */}
-      <div className="flex flex-col border-b border-border px-6 py-4">
-        <div className="flex items-center gap-2 mb-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <Activity className="h-5 w-5 text-primary-foreground" />
+    <aside className="hidden md:flex h-screen w-[260px] flex-col border-r border-border bg-[var(--sidebar)] ios-material">
+      <div className="flex h-full flex-col">
+        {/* Logo/Brand */}
+        <div className="flex flex-col border-b border-border px-5 py-4">
+          <div className="flex items-center gap-2.5 mb-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-[8px] bg-primary">
+              <Activity className="h-[18px] w-[18px] text-primary-foreground" />
+            </div>
+            <span className="text-[17px] font-semibold text-foreground tracking-[-0.01em]">
+              Trader
+            </span>
           </div>
-          <span className="text-lg font-semibold text-sidebar-foreground">
-            Trader
-          </span>
+          {dailyQuote && (
+            <p className="text-[12px] text-muted-foreground italic leading-relaxed">
+              &quot;{dailyQuote}&quot;
+            </p>
+          )}
         </div>
-        {dailyQuote && (
-          <p className="text-xs text-muted-foreground italic leading-relaxed">
-            &quot;{dailyQuote}&quot;
-          </p>
-        )}
-      </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 space-y-1 p-4">
+        {/* Navigation */}
+        <nav className="flex-1 space-y-0.5 px-3 py-3">
+          {navItems.map((item) => {
+            const isActive = pathname === item.href
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex items-center gap-3 rounded-[10px] px-3 py-2.5 text-[15px] font-medium transition-colors",
+                  isActive
+                    ? "bg-[var(--sidebar-accent)] text-[var(--sidebar-accent-foreground)] font-semibold"
+                    : "text-foreground/70 hover:bg-accent hover:text-foreground"
+                )}
+              >
+                <item.icon className={cn("h-[20px] w-[20px]", isActive && "text-primary")} />
+                {item.name}
+              </Link>
+            )
+          })}
+        </nav>
+
+        {/* User section */}
+        <div className="border-t border-border p-4">
+          <div className="mb-3 px-2">
+            <p className="text-[12px] text-muted-foreground">Signed in as</p>
+            <p className="truncate text-[14px] font-medium text-foreground">
+              {userName}
+            </p>
+          </div>
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-3 text-foreground/70 hover:text-foreground"
+            onClick={handleLogout}
+          >
+            <LogOut className="h-[18px] w-[18px]" />
+            Log out
+          </Button>
+        </div>
+      </div>
+    </aside>
+  )
+}
+
+
+function MobileTabBar() {
+  const pathname = usePathname()
+
+  return (
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/80 ios-material safe-area-bottom">
+      <div className="flex items-center justify-around h-[49px] pb-[env(safe-area-inset-bottom)]">
         {navItems.map((item) => {
           const isActive = pathname === item.href
-          const LinkComponent = (
+          return (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                "flex flex-col items-center justify-center gap-0.5 min-w-[64px] py-1 transition-colors",
                 isActive
-                  ? "bg-primary/10 text-primary font-medium"
-                  : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                  ? "text-primary"
+                  : "text-muted-foreground"
               )}
             >
-              <item.icon className="h-5 w-5" />
-              {item.name}
+              <item.icon className="h-[22px] w-[22px]" />
+              <span className="text-[10px] font-medium">{item.name}</span>
             </Link>
           )
-
-          if (mobile) {
-            return (
-              <SheetClose asChild key={item.href}>
-                {LinkComponent}
-              </SheetClose>
-            )
-          }
-
-          return LinkComponent
         })}
-      </nav>
-
-      {/* User section */}
-      <div className="border-t border-border p-4">
-        <div className="mb-3 px-3">
-          <p className="text-xs text-muted-foreground">Signed in as</p>
-          <p className="truncate text-sm font-medium text-sidebar-foreground">
-            {userName}
-          </p>
-        </div>
-        <Button
-          variant="ghost"
-          className="w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-          onClick={handleLogout}
-        >
-          <LogOut className="h-5 w-5" />
-          Log out
-        </Button>
       </div>
-    </div>
+    </nav>
   )
 }
+
 
 export function Sidebar({ userName }: SidebarProps) {
   return (
     <>
-      {/* Mobile Sidebar (Sheet) */}
-      <div className="flex md:hidden items-center p-4 border-b bg-sidebar">
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="mr-2">
-              <Menu className="h-6 w-6" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="p-0 w-72">
-            <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-            <SidebarContent userName={userName} mobile />
-          </SheetContent>
-        </Sheet>
-        <div className="flex items-center gap-2">
-           <div className="flex h-6 w-6 items-center justify-center rounded bg-primary">
-             <Activity className="h-4 w-4 text-primary-foreground" />
-           </div>
-           <span className="font-semibold">Trader</span>
-        </div>
-      </div>
-
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex h-screen w-64 flex-col border-r border-border bg-sidebar">
-        <SidebarContent userName={userName} />
-      </aside>
+      <DesktopSidebar userName={userName} />
+
+      {/* Mobile Bottom Tab Bar */}
+      <MobileTabBar />
     </>
   )
 }

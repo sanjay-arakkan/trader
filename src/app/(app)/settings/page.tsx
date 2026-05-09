@@ -52,24 +52,25 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="p-6 lg:p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground">Settings</h1>
-        <p className="mt-2 text-muted-foreground">
+    <div className="px-5 py-6 lg:px-8">
+      {/* iOS Large Title */}
+      <div className="mb-6">
+        <h1 className="text-[34px] font-bold text-foreground tracking-[-0.02em]">Settings</h1>
+        <p className="mt-1 text-[15px] text-muted-foreground">
           Customize your trading dashboard experience
         </p>
       </div>
 
-      <div className="max-w-2xl space-y-6">
+      <div className="max-w-2xl space-y-5">
         {/* Trading Configuration */}
         <Card>
           <CardHeader>
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+              <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-primary/10">
                 <Settings className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <CardTitle className="text-lg">Trading Configuration</CardTitle>
+                <CardTitle>Trading Configuration</CardTitle>
                 <CardDescription>
                   Set your initial capital and starting date for projections
                 </CardDescription>
@@ -85,11 +86,11 @@ export default function SettingsPage() {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                <Settings className="h-5 w-5 text-primary" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[var(--ios-system-purple)]/10">
+                <Settings className="h-5 w-5 text-[var(--ios-system-purple)]" />
               </div>
               <div>
-                <CardTitle className="text-lg">Appearance</CardTitle>
+                <CardTitle>Appearance</CardTitle>
                 <CardDescription>
                   Customize how the app looks on your device
                 </CardDescription>
@@ -98,34 +99,34 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <Label className="text-sm font-medium">Theme</Label>
+              <Label className="text-[13px] font-semibold text-muted-foreground uppercase tracking-wider">Theme</Label>
               <div className="grid grid-cols-3 gap-3">
                 <Button
-                  variant={theme === "light" ? "default" : "outline"}
-                  className="flex h-auto flex-col items-center gap-2 py-4"
+                  variant={theme === "light" ? "default" : "secondary"}
+                  className="flex h-auto flex-col items-center gap-2 py-4 rounded-[12px]"
                   onClick={() => handleThemeChange("light")}
                 >
                   <Sun className="h-5 w-5" />
-                  <span className="text-xs">Light</span>
+                  <span className="text-[13px]">Light</span>
                 </Button>
                 <Button
-                  variant={theme === "dark" ? "default" : "outline"}
-                  className="flex h-auto flex-col items-center gap-2 py-4"
+                  variant={theme === "dark" ? "default" : "secondary"}
+                  className="flex h-auto flex-col items-center gap-2 py-4 rounded-[12px]"
                   onClick={() => handleThemeChange("dark")}
                 >
                   <Moon className="h-5 w-5" />
-                  <span className="text-xs">Dark</span>
+                  <span className="text-[13px]">Dark</span>
                 </Button>
                 <Button
-                  variant={theme === "system" ? "default" : "outline"}
-                  className="flex h-auto flex-col items-center gap-2 py-4"
+                  variant={theme === "system" ? "default" : "secondary"}
+                  className="flex h-auto flex-col items-center gap-2 py-4 rounded-[12px]"
                   onClick={() => handleThemeChange("system")}
                 >
                   <Monitor className="h-5 w-5" />
-                  <span className="text-xs">System</span>
+                  <span className="text-[13px]">System</span>
                 </Button>
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-[13px] text-muted-foreground">
                 Select your preferred theme. System will match your device settings.
               </p>
             </div>

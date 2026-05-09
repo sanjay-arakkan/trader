@@ -318,18 +318,18 @@ export default function InsightsPage() {
 
   if (isLoading) {
     return (
-      <div className="p-6 lg:p-8 flex items-center justify-center min-h-[50vh]">
-        <p className="text-muted-foreground">Loading insights...</p>
+      <div className="px-5 py-6 lg:px-8 flex items-center justify-center min-h-[50vh]">
+        <p className="text-muted-foreground text-[15px]">Loading insights...</p>
       </div>
     )
   }
 
   if (entries.length === 0) {
     return (
-      <div className="p-6 lg:p-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground">Insights</h1>
-          <p className="mt-2 text-muted-foreground">
+      <div className="px-5 py-6 lg:px-8">
+        <div className="mb-6">
+          <h1 className="text-[34px] font-bold text-foreground tracking-[-0.02em]">Insights</h1>
+          <p className="mt-1 text-[15px] text-muted-foreground">
             No journal entries yet. Add entries in the Journal page to see insights.
           </p>
         </div>
@@ -338,10 +338,10 @@ export default function InsightsPage() {
   }
 
   return (
-    <div className="p-6 lg:p-8 space-y-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground">Insights</h1>
-        <p className="mt-2 text-muted-foreground">
+    <div className="px-5 py-6 lg:px-8 space-y-6">
+      <div className="mb-2">
+        <h1 className="text-[34px] font-bold text-foreground tracking-[-0.02em]">Insights</h1>
+        <p className="mt-1 text-[15px] text-muted-foreground">
           Analyze your trading performance with charts and statistics
         </p>
       </div>
@@ -360,7 +360,7 @@ export default function InsightsPage() {
           <CardContent>
             <div className={cn(
               "text-2xl font-bold",
-              stats.realizedProfit >= 0 ? "text-green-600" : "text-red-600"
+              stats.realizedProfit >= 0 ? "text-[var(--ios-system-green)]" : "text-[var(--ios-system-red)]"
             )}>
               {formatCurrency(stats.realizedProfit)}
             </div>
@@ -376,7 +376,7 @@ export default function InsightsPage() {
             <Percent className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">
+            <div className="text-2xl font-bold text-[var(--ios-system-red)]">
               {formatCurrency(stats.totalBrokerage)}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -406,7 +406,7 @@ export default function InsightsPage() {
           <CardContent>
             <div className={cn(
               "text-2xl font-bold",
-              stats.avgDailyProfit >= 0 ? "text-green-600" : "text-red-600"
+              stats.avgDailyProfit >= 0 ? "text-[var(--ios-system-green)]" : "text-[var(--ios-system-red)]"
             )}>
               {formatCurrency(stats.avgDailyProfit)}
             </div>
@@ -433,7 +433,7 @@ export default function InsightsPage() {
                   {streaks.lastStatus === 'win' ? (
                     <>
                       <Trophy className="h-5 w-5 text-green-500" />
-                      <span className="text-xl font-bold text-green-600">{streaks.currentWinStreak} wins</span>
+                      <span className="text-xl font-bold text-[var(--ios-system-green)]">{streaks.currentWinStreak} wins</span>
                     </>
                   ) : streaks.lastStatus === 'loss' ? (
                     <>
@@ -458,7 +458,7 @@ export default function InsightsPage() {
                           </span>
                         )}
                       </div>
-                      <span className="font-bold text-green-600 text-nowrap">{streaks.maxWinStreak} wins</span>
+                      <span className="font-bold text-[var(--ios-system-green)] text-nowrap">{streaks.maxWinStreak} wins</span>
                     </div>
                   </div>
                   <div className="flex flex-col border-b pb-2">
@@ -471,7 +471,7 @@ export default function InsightsPage() {
                           </span>
                         )}
                       </div>
-                      <span className="font-bold text-red-600 text-nowrap">{streaks.maxLossStreak} losses</span>
+                      <span className="font-bold text-[var(--ios-system-red)] text-nowrap">{streaks.maxLossStreak} losses</span>
                     </div>
                   </div>
                 </div>
@@ -494,7 +494,7 @@ export default function InsightsPage() {
                   {stats.topWins.map((win, i) => (
                     <div key={i} className="flex justify-between items-center text-sm">
                       <span className="text-muted-foreground">{format(parseISO(win.date), "MMM dd")}</span>
-                      <span className="font-bold text-green-600">{formatCurrency(win.netProfit)}</span>
+                      <span className="font-bold text-[var(--ios-system-green)]">{formatCurrency(win.netProfit)}</span>
                     </div>
                   ))}
                   {stats.topWins.length === 0 && <span className="text-sm text-muted-foreground">-</span>}
@@ -506,7 +506,7 @@ export default function InsightsPage() {
                   {stats.topLosses.map((loss, i) => (
                     <div key={i} className="flex justify-between items-center text-sm">
                       <span className="text-muted-foreground">{format(parseISO(loss.date), "MMM dd")}</span>
-                      <span className="font-bold text-red-600">{formatCurrency(loss.netProfit)}</span>
+                      <span className="font-bold text-[var(--ios-system-red)]">{formatCurrency(loss.netProfit)}</span>
                     </div>
                   ))}
                   {stats.topLosses.length === 0 && <span className="text-sm text-muted-foreground">-</span>}

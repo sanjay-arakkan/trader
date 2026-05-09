@@ -24,7 +24,7 @@ export default async function AppLayout({
   return (
     <div className="flex h-screen flex-col md:flex-row">
       <Sidebar userName={userName} />
-      <main className="flex-1 overflow-auto bg-background">
+      <main className="flex-1 overflow-auto bg-background pb-[calc(49px+env(safe-area-inset-bottom))] md:pb-0">
         {children}
       </main>
     </div>

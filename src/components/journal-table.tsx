@@ -245,25 +245,25 @@ export function JournalTable() {
     const lower = status.toLowerCase();
 
     if (lower === "losing" || lower === "losing day" || lower.includes("loss"))
-      return "bg-red-500";
+      return "bg-[var(--ios-system-red)]";
     if (lower === "target_failed" || lower === "target failed")
-      return "bg-orange-500";
+      return "bg-[var(--ios-system-orange)]";
     if (
       lower === "market_holiday" ||
       lower === "market holiday" ||
       lower.includes("holiday")
     )
-      return "bg-gray-500";
+      return "bg-[var(--ios-system-gray)]";
     if (lower === "special_occasion" || lower === "special occasion")
-      return "bg-gray-500";
-    if (lower === "no_trade" || lower === "no trade") return "bg-gray-500";
+      return "bg-[var(--ios-system-gray)]";
+    if (lower === "no_trade" || lower === "no trade") return "bg-[var(--ios-system-gray)]";
     if (
       lower === "target_achieved" ||
       lower === "target achieved" ||
       lower.includes("profit") ||
       lower.includes("win")
     )
-      return "bg-green-500";
+      return "bg-[var(--ios-system-green)]";
 
     return "bg-transparent";
   };
@@ -467,13 +467,13 @@ export function JournalTable() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div className="flex flex-col gap-4">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <Button
-              variant="outline"
-              size="icon"
+              variant="ghost"
+              size="icon-sm"
               onClick={handlePrevMonth}
               disabled={
                 config.startDate
@@ -481,28 +481,28 @@ export function JournalTable() {
                   : false
               }
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-5 w-5" />
             </Button>
-            <h2 className="text-xl font-semibold w-40 text-center">
+            <h2 className="text-[20px] font-semibold w-44 text-center tracking-[-0.01em]">
               {format(currentMonth, "MMMM yyyy")}
             </h2>
-            <Button variant="outline" size="icon" onClick={handleNextMonth}>
-              <ChevronRight className="h-4 w-4" />
+            <Button variant="ghost" size="icon-sm" onClick={handleNextMonth}>
+              <ChevronRight className="h-5 w-5" />
             </Button>
           </div>
 
           <div className="flex gap-8 px-4">
             <div className="flex flex-col items-center">
-              <span className="text-sm font-medium text-muted-foreground uppercase text-[10px]">
+              <span className="font-semibold text-muted-foreground uppercase text-[11px] tracking-wider">
                 Realized Profit
               </span>
               <span
                 className={cn(
-                  "text-2xl font-bold",
+                  "text-[22px] font-bold tracking-[-0.01em]",
                   monthlyTotals.realizedProfit > 0
-                    ? "text-green-600"
+                    ? "text-[var(--ios-system-green)]"
                     : monthlyTotals.realizedProfit < 0
-                      ? "text-red-600"
+                      ? "text-[var(--ios-system-red)]"
                       : "",
                 )}
               >
@@ -510,10 +510,10 @@ export function JournalTable() {
               </span>
             </div>
             <div className="flex flex-col items-center">
-              <span className="text-sm font-medium text-muted-foreground uppercase text-[10px]">
+              <span className="font-semibold text-muted-foreground uppercase text-[11px] tracking-wider">
                 Charges
               </span>
-              <span className="text-2xl font-bold">
+              <span className="text-[22px] font-bold tracking-[-0.01em]">
                 {formatCurrency(monthlyTotals.totalBrokerage.toFixed(0))}
               </span>
             </div>
@@ -521,10 +521,10 @@ export function JournalTable() {
         </div>
       </div>
 
-      <div className="rounded-md border max-h-[75vh] overflow-y-auto relative bg-background">
-        <table className="w-full caption-bottom text-sm text-left">
-          <TableHeader className="sticky top-0 z-10 bg-background shadow-sm">
-            <TableRow className="bg-muted/50 hover:bg-muted/50 border-b">
+      <div className="rounded-[14px] border border-border max-h-[75vh] overflow-y-auto relative bg-card ios-shadow">
+        <table className="w-full caption-bottom text-[14px] text-left">
+          <TableHeader className="sticky top-0 z-10 bg-card">
+            <TableRow className="bg-[var(--ios-fill-quaternary)] hover:bg-[var(--ios-fill-quaternary)] border-b border-border">
               <TableHead className="w-[140px] pl-4 font-semibold text-muted-foreground h-10">
                 Day
               </TableHead>
@@ -597,10 +597,10 @@ export function JournalTable() {
                       <TableRow
                         key={dateStr}
                         className={cn(
-                          "relative group border-b transition-colors data-[state=selected]:bg-muted",
+                          "relative group border-b border-[var(--ios-separator)] transition-colors",
                           isTodayDate
-                            ? "bg-blue-100 dark:bg-blue-900/40"
-                            : "hover:bg-muted/50",
+                            ? "bg-[var(--ios-system-blue)]/8 dark:bg-[var(--ios-system-blue)]/12"
+                            : "hover:bg-accent/60",
                         )}
                       >
                         <TableCell className="font-medium whitespace-nowrap pl-4 relative h-12 py-1">
@@ -645,8 +645,8 @@ export function JournalTable() {
                                 <span
                                   className={cn(
                                     "font-bold",
-                                    val === "positive" && "text-green-600",
-                                    val === "negative" && "text-red-600",
+                                    val === "positive" && "text-[var(--ios-system-green)]",
+                                    val === "negative" && "text-[var(--ios-system-red)]",
                                     val === "indecisive" && "text-foreground",
                                   )}
                                 >
@@ -749,11 +749,11 @@ export function JournalTable() {
                                 calculated.rawProfit >
                                   (calculated.rawTarget || 0) &&
                                   calculated.rawTarget > 0
-                                  ? "text-green-600"
+                                  ? "text-[var(--ios-system-green)]"
                                   : calculated.rawProfit <
                                         -(calculated.rawMaxSL || 0) &&
                                       calculated.rawMaxSL > 0
-                                    ? "text-red-600"
+                                    ? "text-[var(--ios-system-red)]"
                                     : "text-foreground",
                               )}
                             >
@@ -780,7 +780,7 @@ export function JournalTable() {
                               className={cn(
                                 "font-bold",
                                 calculated.isHighBrokerage
-                                  ? "text-red-600"
+                                  ? "text-[var(--ios-system-red)]"
                                   : "text-foreground",
                               )}
                             >
@@ -797,9 +797,9 @@ export function JournalTable() {
                           className={cn(
                             "font-medium h-12 py-1",
                             calculated.rawProfitPercent > 1
-                              ? "text-green-600"
+                              ? "text-[var(--ios-system-green)]"
                               : calculated.rawProfitPercent < 0
-                                ? "text-red-600"
+                                ? "text-[var(--ios-system-red)]"
                                 : "text-foreground",
                           )}
                         >
@@ -831,7 +831,7 @@ export function JournalTable() {
                       </TableRow>
                     );
                   })}
-                  <TableRow className="bg-muted/30 hover:bg-muted/30">
+                  <TableRow className="bg-[var(--ios-fill-quaternary)] hover:bg-[var(--ios-fill-quaternary)]">
                     <TableCell colSpan={15} className="p-4">
                       <div className="flex flex-col gap-4">
                         <div className="flex items-center gap-6 text-sm">
@@ -843,9 +843,9 @@ export function JournalTable() {
                               className={cn(
                                 "font-bold",
                                 totals.realizedProfit > 0
-                                  ? "text-green-600"
+                                  ? "text-[var(--ios-system-green)]"
                                   : totals.realizedProfit < 0
-                                    ? "text-red-600"
+                                    ? "text-[var(--ios-system-red)]"
                                     : "",
                               )}
                             >
@@ -918,7 +918,7 @@ export function JournalTable() {
                       </div>
                     </TableCell>
                   </TableRow>
-                  <TableRow className="h-4 bg-transparent border-none hover:bg-transparent pointer-events-none">
+                  <TableRow className="h-3 bg-transparent border-none hover:bg-transparent pointer-events-none">
                     <TableCell colSpan={15}></TableCell>
                   </TableRow>
                 </React.Fragment>

@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { TrendingUp, AlertCircle } from "lucide-react"
+import { Activity, AlertCircle } from "lucide-react"
 import { toast } from "sonner"
 
 function LoginForm() {
@@ -62,7 +62,7 @@ function LoginForm() {
       toast.success("Welcome back!", {
         description: "You have been signed in successfully.",
       })
-      router.push("/plan")
+      router.push("/journal")
       router.refresh()
     }
   }
@@ -100,22 +100,22 @@ function LoginForm() {
       toast.success("Account created!", {
         description: `Welcome ${firstName}! Your account has been created successfully.`,
       })
-      router.push("/plan")
+      router.push("/journal")
       router.refresh()
     }
   }
 
   return (
-    <Card className="border-border/50 shadow-xl">
+    <Card className="ios-shadow-lg">
       <CardHeader className="text-center">
-        <CardTitle className="text-xl">Welcome</CardTitle>
+        <CardTitle className="text-[20px]">Welcome</CardTitle>
         <CardDescription>
           Sign in to your account or create a new one
         </CardDescription>
       </CardHeader>
       <CardContent>
         {error && (
-          <div className="mb-4 flex items-center gap-2 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+          <div className="mb-4 flex items-center gap-2.5 rounded-[10px] bg-[var(--ios-system-red)]/10 p-3.5 text-[14px] text-[var(--ios-system-red)]">
             <AlertCircle className="h-4 w-4 flex-shrink-0" />
             {error}
           </div>
@@ -222,12 +222,12 @@ function LoginForm() {
                   disabled={isLoading}
                   className={
                     confirmPassword && !passwordsMatch
-                      ? "border-destructive focus-visible:ring-destructive"
+                      ? "border-[var(--ios-system-red)] focus:ring-[var(--ios-system-red)]/30"
                       : ""
                   }
                 />
                 {confirmPassword && !passwordsMatch && (
-                  <p className="text-xs text-destructive">Passwords do not match</p>
+                  <p className="text-[12px] text-[var(--ios-system-red)]">Passwords do not match</p>
                 )}
               </div>
               <Button
@@ -247,21 +247,21 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-background to-muted/30 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-background p-5">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center">
-          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary shadow-lg">
-            <TrendingUp className="h-8 w-8 text-primary-foreground" />
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-[18px] bg-primary ios-shadow">
+            <Activity className="h-9 w-9 text-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-bold text-foreground">Trader</h1>
-          <p className="text-sm text-muted-foreground">Track your trading journey</p>
+          <h1 className="text-[28px] font-bold text-foreground tracking-[-0.02em]">Trader</h1>
+          <p className="text-[15px] text-muted-foreground">Track your trading journey</p>
         </div>
 
         <Suspense fallback={
-          <Card className="border-border/50 shadow-xl">
+          <Card className="ios-shadow-lg">
             <CardHeader className="text-center">
-              <CardTitle className="text-xl">Loading...</CardTitle>
+              <CardTitle className="text-[20px]">Loading...</CardTitle>
             </CardHeader>
           </Card>
         }>

@@ -6,7 +6,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -46,149 +46,327 @@
   --radius-4xl: calc(var(--radius) + 16px);
 }
 
+/* ============================================
+   iOS Light Mode — Apple HIG Colors
+   ============================================ */
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+
+  /* Backgrounds — iOS Grouped */
+  --background: #F2F2F7;
+  --foreground: #000000;
+
+  /* Cards — iOS Card / Grouped Inset */
+  --card: #FFFFFF;
+  --card-foreground: #000000;
+
+  /* Popover */
+  --popover: #FFFFFF;
+  --popover-foreground: #000000;
+
+  /* Primary — iOS System Blue */
+  --primary: #007AFF;
+  --primary-foreground: #FFFFFF;
+
+  /* Secondary — iOS Secondary Fill */
+  --secondary: rgba(120, 120, 128, 0.16);
+  --secondary-foreground: #000000;
+
+  /* Muted — iOS Tertiary Fill */
+  --muted: rgba(120, 120, 128, 0.08);
+  --muted-foreground: #8E8E93;
+
+  /* Accent — iOS Quaternary Fill */
+  --accent: rgba(120, 120, 128, 0.08);
+  --accent-foreground: #000000;
+
+  /* Destructive — iOS System Red (Ruby) */
+  --destructive: #C6011F;
+
+  /* Borders — iOS Separator */
+  --border: rgba(60, 60, 67, 0.12);
+  --input: rgba(120, 120, 128, 0.16);
+  --ring: #007AFF;
+
+  /* Charts — iOS System Colors */
+  --chart-1: #007AFF;
+  --chart-2: #1DB954;
+  --chart-3: #FF9500;
+  --chart-4: #AF52DE;
+  --chart-5: #C6011F;
+
+  /* Sidebar */
+  --sidebar: rgba(255, 255, 255, 0.72);
+  --sidebar-foreground: #000000;
+  --sidebar-primary: #007AFF;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: rgba(0, 122, 255, 0.08);
+  --sidebar-accent-foreground: #007AFF;
+  --sidebar-border: rgba(60, 60, 67, 0.12);
+  --sidebar-ring: #007AFF;
+
+  /* iOS Semantic Colors */
+  --ios-system-blue: #007AFF;
+  --ios-system-green: #1DB954;
+  --ios-system-red: #C6011F;
+  --ios-system-orange: #FF9500;
+  --ios-system-yellow: #FFCC00;
+  --ios-system-purple: #AF52DE;
+  --ios-system-teal: #5AC8FA;
+  --ios-system-gray: #8E8E93;
+  --ios-system-gray2: #AEAEB2;
+  --ios-system-gray3: #C7C7CC;
+  --ios-system-gray4: #D1D1D6;
+  --ios-system-gray5: #E5E5EA;
+  --ios-system-gray6: #F2F2F7;
+  --ios-label: #000000;
+  --ios-label-secondary: #3C3C43;
+  --ios-label-tertiary: rgba(60, 60, 67, 0.60);
+  --ios-label-quaternary: rgba(60, 60, 67, 0.18);
+  --ios-separator: rgba(60, 60, 67, 0.12);
+  --ios-separator-opaque: #C6C6C8;
+  --ios-fill: rgba(120, 120, 128, 0.20);
+  --ios-fill-secondary: rgba(120, 120, 128, 0.16);
+  --ios-fill-tertiary: rgba(118, 118, 128, 0.12);
+  --ios-fill-quaternary: rgba(116, 116, 128, 0.08);
+  --ios-bg-primary: #FFFFFF;
+  --ios-bg-secondary: #F2F2F7;
+  --ios-bg-tertiary: #FFFFFF;
 }
 
+/* ============================================
+   iOS Dark Mode — Apple HIG Colors
+   ============================================ */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #000000;
+  --foreground: #FFFFFF;
+
+  --card: #1C1C1E;
+  --card-foreground: #FFFFFF;
+
+  --popover: #2C2C2E;
+  --popover-foreground: #FFFFFF;
+
+  --primary: #0A84FF;
+  --primary-foreground: #FFFFFF;
+
+  --secondary: rgba(120, 120, 128, 0.32);
+  --secondary-foreground: #FFFFFF;
+
+  --muted: rgba(120, 120, 128, 0.18);
+  --muted-foreground: #98989D;
+
+  --accent: rgba(120, 120, 128, 0.18);
+  --accent-foreground: #FFFFFF;
+
+  --destructive: #C6011F;
+
+  --border: rgba(84, 84, 88, 0.65);
+  --input: rgba(120, 120, 128, 0.32);
+  --ring: #0A84FF;
+
+  --chart-1: #0A84FF;
+  --chart-2: #1DB954;
+  --chart-3: #FF9F0A;
+  --chart-4: #BF5AF2;
+  --chart-5: #C6011F;
+
+  --sidebar: rgba(28, 28, 30, 0.72);
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #0A84FF;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: rgba(10, 132, 255, 0.12);
+  --sidebar-accent-foreground: #0A84FF;
+  --sidebar-border: rgba(84, 84, 88, 0.65);
+  --sidebar-ring: #0A84FF;
+
+  --ios-system-blue: #0A84FF;
+  --ios-system-green: #1DB954;
+  --ios-system-red: #C6011F;
+  --ios-system-orange: #FF9F0A;
+  --ios-system-yellow: #FFD60A;
+  --ios-system-purple: #BF5AF2;
+  --ios-system-teal: #64D2FF;
+  --ios-system-gray: #98989D;
+  --ios-system-gray2: #636366;
+  --ios-system-gray3: #48484A;
+  --ios-system-gray4: #3A3A3C;
+  --ios-system-gray5: #2C2C2E;
+  --ios-system-gray6: #1C1C1E;
+  --ios-label: #FFFFFF;
+  --ios-label-secondary: rgba(235, 235, 245, 0.60);
+  --ios-label-tertiary: rgba(235, 235, 245, 0.30);
+  --ios-label-quaternary: rgba(235, 235, 245, 0.18);
+  --ios-separator: rgba(84, 84, 88, 0.65);
+  --ios-separator-opaque: #38383A;
+  --ios-fill: rgba(120, 120, 128, 0.36);
+  --ios-fill-secondary: rgba(120, 120, 128, 0.32);
+  --ios-fill-tertiary: rgba(118, 118, 128, 0.24);
+  --ios-fill-quaternary: rgba(118, 118, 128, 0.18);
+  --ios-bg-primary: #000000;
+  --ios-bg-secondary: #1C1C1E;
+  --ios-bg-tertiary: #2C2C2E;
 }
 
+/* ============================================
+   Base Styles
+   ============================================ */
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    -webkit-tap-highlight-color: transparent;
   }
+
   body {
     @apply bg-background text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', var(--font-sans), 'Helvetica Neue', Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
+
   button {
     @apply cursor-pointer;
   }
+
+  /* iOS-style selection */
+  ::selection {
+    background: rgba(0, 122, 255, 0.2);
+  }
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Custom scrollbar — thin and subtle */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--ios-system-gray4);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--ios-system-gray3);
+  }
 }
 
+/* ============================================
+   iOS Material / Vibrancy
+   ============================================ */
+.ios-material {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+.ios-material-thick {
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+}
+
+.ios-material-thin {
+  backdrop-filter: blur(10px) saturate(150%);
+  -webkit-backdrop-filter: blur(10px) saturate(150%);
+}
+
+/* ============================================
+   iOS Shadows
+   ============================================ */
+.ios-shadow-sm {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.ios-shadow {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.ios-shadow-lg {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.dark .ios-shadow-sm {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.dark .ios-shadow {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.dark .ios-shadow-lg {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* ============================================
+   Recharts
+   ============================================ */
 .recharts-wrapper, .recharts-surface {
   outline: none !important;
 }
 
-/* Prose styles for markdown rendering */
+/* ============================================
+   Prose — iOS Typography Hierarchy
+   ============================================ */
 .prose {
-  line-height: 1.75;
+  line-height: 1.65;
   color: var(--foreground);
+  font-size: 15px;
 }
 
 .prose h1 {
-  font-size: 2rem;
+  font-size: 28px;
   font-weight: 700;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
   line-height: 1.2;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 0.5rem;
+  letter-spacing: -0.02em;
 }
 
 .prose h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-top: 1.75rem;
-  margin-bottom: 0.75rem;
+  font-size: 22px;
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 0.625rem;
   line-height: 1.3;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 0.375rem;
+  letter-spacing: -0.01em;
 }
 
 .prose h3 {
-  font-size: 1.25rem;
+  font-size: 20px;
   font-weight: 600;
-  margin-top: 1.5rem;
+  margin-top: 1.25rem;
   margin-bottom: 0.5rem;
-  line-height: 1.4;
+  line-height: 1.35;
 }
 
 .prose h4 {
-  font-size: 1.1rem;
+  font-size: 17px;
   font-weight: 600;
-  margin-top: 1.25rem;
+  margin-top: 1rem;
   margin-bottom: 0.5rem;
 }
 
 .prose p {
-  margin-top: 0.75rem;
-  margin-bottom: 0.75rem;
+  margin-top: 0.625rem;
+  margin-bottom: 0.625rem;
 }
 
 .prose a {
   color: var(--primary);
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  text-decoration: none;
 }
 
 .prose a:hover {
-  opacity: 0.8;
+  text-decoration: underline;
 }
 
 .prose strong {
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .prose ul {
@@ -206,74 +384,74 @@
 }
 
 .prose li {
-  margin-top: 0.25rem;
-  margin-bottom: 0.25rem;
+  margin-top: 0.2rem;
+  margin-bottom: 0.2rem;
 }
 
 .prose li > ul,
 .prose li > ol {
-  margin-top: 0.25rem;
-  margin-bottom: 0.25rem;
+  margin-top: 0.2rem;
+  margin-bottom: 0.2rem;
 }
 
 .prose blockquote {
   border-left: 3px solid var(--primary);
   padding-left: 1rem;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
   color: var(--muted-foreground);
   font-style: italic;
 }
 
 .prose code {
   font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 0.875em;
-  background: var(--muted);
-  padding: 0.2em 0.4em;
-  border-radius: 0.25rem;
+  font-size: 0.85em;
+  background: var(--ios-fill-tertiary);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
 }
 
 .prose pre {
-  background: var(--muted);
+  background: var(--ios-bg-secondary);
   border: 1px solid var(--border);
-  border-radius: 0.5rem;
+  border-radius: 10px;
   padding: 1rem;
   overflow-x: auto;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
 }
 
 .prose pre code {
   background: transparent;
   padding: 0;
-  font-size: 0.875rem;
+  font-size: 13px;
 }
 
 .prose hr {
   border: none;
-  border-top: 1px solid var(--border);
-  margin-top: 1.5rem;
-  margin-bottom: 1.5rem;
+  border-top: 0.5px solid var(--ios-separator-opaque);
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
 }
 
 .prose table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-  font-size: 0.875rem;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+  font-size: 14px;
 }
 
 .prose thead th {
   text-align: left;
   font-weight: 600;
   padding: 0.5rem 0.75rem;
-  border-bottom: 2px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 .prose tbody td {
   padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 0.5px solid var(--ios-separator);
 }
 
 .prose tbody tr:last-child td {
@@ -282,9 +460,9 @@
 
 .prose img {
   max-width: 100%;
-  border-radius: 0.5rem;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+  border-radius: 10px;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
 }
 
 .prose input[type="checkbox"] {
@@ -297,4 +475,15 @@
 
 .prose > *:last-child {
   margin-bottom: 0;
+}
+
+/* ============================================
+   iOS Transition Curves
+   ============================================ */
+.ios-transition {
+  transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ios-spring {
+  transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
