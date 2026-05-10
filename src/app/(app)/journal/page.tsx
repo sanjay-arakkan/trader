@@ -131,8 +131,8 @@ function CumulativePnLCard({ selectedMonth }: { selectedMonth: Date }) {
       className="relative flex h-full flex-1 flex-col overflow-hidden rounded-[16px] ios-shadow-lg"
       style={{
         background: isPositive
-          ? "url('/images/green.avif') center/cover no-repeat"
-          : "linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%)",
+          ? "url('/images/journal-profit.avif') center/cover no-repeat"
+          : "url('/images/journal-loss.jpg') center/cover no-repeat",
       }}
     >
       <Card
@@ -143,7 +143,7 @@ function CumulativePnLCard({ selectedMonth }: { selectedMonth: Date }) {
         <div className="mb-4 flex items-start justify-between">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-wider text-white/70">
-              Monthly Cumulative P&amp;L
+              Monthly P&amp;L for {format(selectedMonth, "MMMM yyyy")}
             </p>
             <div className="mt-1 h-8">
               {isLoading ? (
@@ -154,12 +154,6 @@ function CumulativePnLCard({ selectedMonth }: { selectedMonth: Date }) {
                 </p>
               )}
             </div>
-            <p className="text-[11px] text-white/50 mt-1">
-              {format(selectedMonth, "MMMM yyyy")} ·{" "}
-              {format(selectedMonth, "yyyy-MM") === format(new Date(), "yyyy-MM")
-                ? "up to today"
-                : "full month"}
-            </p>
           </div>
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20">
             <TrendingUp className="h-4 w-4 text-white" />
@@ -204,7 +198,7 @@ function CumulativePnLCard({ selectedMonth }: { selectedMonth: Date }) {
                   axisLine={false}
                   tickLine={false}
                   tickMargin={8}
-                  width={44}
+                  width={65}
                 />
                 <Tooltip
                   content={<ChartTooltip isPositive={isPositive} />}
@@ -311,9 +305,7 @@ export default function JournalPage() {
             <div
               className="relative flex h-full min-h-[220px] flex-col overflow-hidden rounded-[16px] ios-shadow-lg"
               style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Crect x='60' y='60' width='40' height='60' fill='none' stroke='rgba(255,255,255,0.2)' stroke-width='2'/%3E%3Crect x='70' y='40' width='30' height='20' fill='none' stroke='rgba(255,255,255,0.2)' stroke-width='2'/%3E%3Crect x='40' y='80' width='20' height='40' fill='none' stroke='rgba(255,255,255,0.15)' stroke-width='2'/%3E%3Crect x='100' y='70' width='20' height='50' fill='none' stroke='rgba(255,255,255,0.15)' stroke-width='2'/%3E%3Crect x='80' y='80' width='10' height='10' fill='rgba(255,255,255,0.2)'/%3E%3Crect x='50' y='90' width='10' height='10' fill='rgba(255,255,255,0.15)'/%3E%3Crect x='110' y='90' width='10' height='10' fill='rgba(255,255,255,0.15)'/%3E%3C/svg%3E"), linear-gradient(135deg, #60A5FA 0%, #2563EB 100%)`,
-                backgroundPosition: "bottom right, center",
-                backgroundRepeat: "no-repeat, no-repeat",
+                background: "url('/images/journal-plan.jpg') center/cover no-repeat",
               }}
             >
               <Card className="relative z-10 flex h-full flex-1 flex-col overflow-hidden rounded-[16px] border border-white/20 bg-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)] backdrop-blur-md">
@@ -329,7 +321,7 @@ export default function JournalPage() {
             <div
               className="relative flex h-full flex-col overflow-hidden rounded-[16px] ios-shadow-lg"
               style={{
-                backgroundImage: `linear-gradient(135deg, #60A5FA 0%, #2563EB 100%)`,
+                background: "url('/images/journal-plan.jpg') center/cover no-repeat",
               }}
             >
               <Card className="relative flex h-full flex-col overflow-hidden rounded-[16px] border border-white/20 bg-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)] backdrop-blur-md">
@@ -361,9 +353,7 @@ export default function JournalPage() {
             <div
               className="group relative flex h-full flex-col overflow-hidden rounded-[16px] ios-shadow-lg"
               style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Crect x='60' y='60' width='40' height='60' fill='none' stroke='rgba(255,255,255,0.2)' stroke-width='2'/%3E%3Crect x='70' y='40' width='30' height='20' fill='none' stroke='rgba(255,255,255,0.2)' stroke-width='2'/%3E%3Crect x='40' y='80' width='20' height='40' fill='none' stroke='rgba(255,255,255,0.15)' stroke-width='2'/%3E%3Crect x='100' y='70' width='20' height='50' fill='none' stroke='rgba(255,255,255,0.15)' stroke-width='2'/%3E%3Crect x='80' y='80' width='10' height='10' fill='rgba(255,255,255,0.2)'/%3E%3Crect x='50' y='90' width='10' height='10' fill='rgba(255,255,255,0.15)'/%3E%3Crect x='110' y='90' width='10' height='10' fill='rgba(255,255,255,0.15)'/%3E%3C/svg%3E"), linear-gradient(135deg, #60A5FA 0%, #2563EB 100%)`,
-                backgroundPosition: "bottom right, center",
-                backgroundRepeat: "no-repeat, no-repeat",
+                background: "url('/images/journal-plan.jpg') center/cover no-repeat",
               }}
             >
               <Card

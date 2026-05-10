@@ -22,9 +22,9 @@ export default async function AppLayout({
     : user.email || "User"
 
   return (
-    <div className="flex h-screen flex-col md:flex-row">
+    <div className="flex min-h-screen flex-col">
       <Sidebar userName={userName} />
-      <main className="flex-1 overflow-auto bg-background pb-[calc(49px+env(safe-area-inset-bottom))] md:pb-0">
+      <main className="flex-1 bg-background px-4 md:px-8">
         {children}
       </main>
     </div>

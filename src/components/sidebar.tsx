@@ -8,11 +8,18 @@ import {
   Lightbulb,
   Settings,
   LogOut,
-  Activity,
+  ChevronDown
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { useDailyQuote } from "@/hooks/use-daily-quote"
 
 interface SidebarProps {
@@ -30,19 +37,23 @@ const navItems = [
     href: "/insights",
     icon: Lightbulb,
   },
-  {
-    name: "Settings",
-    href: "/settings",
-    icon: Settings,
-  },
 ]
 
+function getGreeting() {
+  const hour = new Date().getHours()
+  if (hour < 12) return "Good morning"
+  if (hour < 18) return "Good afternoon"
+  return "Good evening"
+}
 
-function DesktopSidebar({ userName }: { userName: string }) {
+export function Sidebar({ userName }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
   const dailyQuote = useDailyQuote()
+
+  const firstName = userName.split(" ")[0] || "User"
+  const greeting = getGreeting()
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -51,108 +62,77 @@ function DesktopSidebar({ userName }: { userName: string }) {
   }
 
   return (
-    <aside className="hidden md:flex h-screen w-[260px] flex-col border-r border-border bg-[var(--sidebar)] ios-material">
-      <div className="flex h-full flex-col">
-        {/* Logo/Brand */}
-        <div className="flex flex-col border-b border-border px-5 py-4">
-          <div className="flex items-center gap-2.5 mb-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-[8px] bg-primary">
-              <Activity className="h-[18px] w-[18px] text-primary-foreground" />
-            </div>
-            <span className="text-[17px] font-semibold text-foreground tracking-[-0.01em]">
-              Trader
-            </span>
-          </div>
-          {dailyQuote && (
-            <p className="text-[12px] text-muted-foreground italic leading-relaxed">
-              &quot;{dailyQuote}&quot;
-            </p>
-          )}
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 space-y-0.5 px-3 py-3">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "flex items-center gap-3 rounded-[10px] px-3 py-2.5 text-[15px] font-medium transition-colors",
-                  isActive
-                    ? "bg-[var(--sidebar-accent)] text-[var(--sidebar-accent-foreground)] font-semibold"
-                    : "text-foreground/70 hover:bg-accent hover:text-foreground"
-                )}
-              >
-                <item.icon className={cn("h-[20px] w-[20px]", isActive && "text-primary")} />
-                {item.name}
-              </Link>
-            )
-          })}
-        </nav>
-
-        {/* User section */}
-        <div className="border-t border-border p-4">
-          <div className="mb-3 px-2">
-            <p className="text-[12px] text-muted-foreground">Signed in as</p>
-            <p className="truncate text-[14px] font-medium text-foreground">
-              {userName}
+    <div className="sticky top-0 z-50 w-full px-4 pt-4 md:px-8 md:pt-6 pointer-events-none">
+      <header className="w-full pointer-events-auto bg-card/90 backdrop-blur-md supports-[backdrop-filter]:bg-card/60 border border-border rounded-[16px] ios-shadow">
+        <div className="flex flex-wrap items-center justify-between px-4 py-4 sm:flex-nowrap sm:px-6 sm:h-20 sm:py-0">
+          
+          {/* Left Section: Greeting & Quote */}
+          <div className="flex flex-col items-start min-w-0 flex-1 order-1">
+            <h1 className="text-xl font-semibold tracking-tight text-foreground truncate w-full">
+              {greeting}, {firstName}
+            </h1>
+            <p className="text-xs text-muted-foreground truncate w-full max-w-md mt-0.5" title={dailyQuote}>
+              {dailyQuote || "Loading..."}
             </p>
           </div>
-          <Button
-            variant="ghost"
-            className="w-full justify-start gap-3 text-foreground/70 hover:text-foreground"
-            onClick={handleLogout}
-          >
-            <LogOut className="h-[18px] w-[18px]" />
-            Log out
-          </Button>
+
+          {/* Middle Section: Navigation Pill */}
+          <div className="flex w-full justify-center order-3 mt-4 sm:mt-0 sm:order-2 sm:w-auto sm:flex-1">
+            <nav className="flex items-center gap-1 bg-accent/30 p-1 rounded-full border border-border/50">
+              {navItems.map((item) => {
+                const isActive = pathname === item.href
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={cn(
+                      "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200",
+                      isActive 
+                        ? "bg-background shadow-sm text-foreground" 
+                        : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                    )}
+                  >
+                    {item.name}
+                  </Link>
+                )
+              })}
+            </nav>
+          </div>
+
+          {/* Right Section: Actions & User Menu */}
+          <div className="flex items-center justify-end gap-3 order-2 flex-1 sm:order-3">   
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-9 px-1.5 pr-2 gap-2 rounded-full bg-accent/30 hover:bg-accent border border-border/50 text-foreground transition-all duration-200 focus-visible:ring-0 focus-visible:ring-offset-0">
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                    <span className="text-[10px] font-bold">{firstName.charAt(0).toUpperCase()}</span>
+                  </div>
+                  <ChevronDown className="h-3 w-3 text-muted-foreground opacity-70 shrink-0" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{userName}</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/settings" className="cursor-pointer flex w-full">
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive cursor-pointer">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          
         </div>
-      </div>
-    </aside>
-  )
-}
-
-
-function MobileTabBar() {
-  const pathname = usePathname()
-
-  return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/80 ios-material safe-area-bottom">
-      <div className="flex items-center justify-around h-[49px] pb-[env(safe-area-inset-bottom)]">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex flex-col items-center justify-center gap-0.5 min-w-[64px] py-1 transition-colors",
-                isActive
-                  ? "text-primary"
-                  : "text-muted-foreground"
-              )}
-            >
-              <item.icon className="h-[22px] w-[22px]" />
-              <span className="text-[10px] font-medium">{item.name}</span>
-            </Link>
-          )
-        })}
-      </div>
-    </nav>
-  )
-}
-
-
-export function Sidebar({ userName }: SidebarProps) {
-  return (
-    <>
-      {/* Desktop Sidebar */}
-      <DesktopSidebar userName={userName} />
-
-      {/* Mobile Bottom Tab Bar */}
-      <MobileTabBar />
-    </>
+      </header>
+    </div>
   )
 }
