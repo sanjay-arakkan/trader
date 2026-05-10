@@ -3,7 +3,7 @@
 import * as React from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-import { Pencil, Save, ClipboardList, X, TrendingUp, Check } from "lucide-react"
+import { Pencil, Save, ClipboardList, X, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { journalService } from "@/services/journal-service"
@@ -154,9 +154,6 @@ function CumulativePnLCard({ selectedMonth }: { selectedMonth: Date }) {
                 </p>
               )}
             </div>
-          </div>
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20">
-            <TrendingUp className="h-4 w-4 text-white" />
           </div>
         </div>
 
@@ -340,7 +337,7 @@ export default function JournalPage() {
               <CardContent className="flex h-full flex-1 flex-col p-0">
                 <textarea
                   id="plan-editor"
-                  className="w-full flex-1 resize-none border-none bg-transparent p-5 pt-14 font-mono text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none"
+                  className="w-full flex-1 resize-none border-none bg-transparent p-5 pt-14 font-mono text-[14px] text-white placeholder:text-white/60 focus:outline-none"
                   value={draftContent}
                   onChange={(e) => setDraftContent(e.target.value)}
                   placeholder={"Write your trading plan using Markdown...\n\n# My Trading Plan\n\n## Rules\n- Rule 1\n- Rule 2\n\n## Strategy\nDescribe your strategy here..."}
