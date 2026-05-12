@@ -62,10 +62,10 @@ export function Sidebar({ userName }: SidebarProps) {
   }
 
   return (
-    <div className="sticky top-0 z-50 w-full px-4 pt-4 md:px-8 md:pt-6 pointer-events-none">
-      <header className="w-full pointer-events-auto bg-card/90 backdrop-blur-md supports-[backdrop-filter]:bg-card/60 border border-border rounded-[16px] ios-shadow">
+    <div className="sticky top-0 z-50 w-full pointer-events-none">
+      <header className="w-full pointer-events-auto bg-card/90 backdrop-blur-md supports-[backdrop-filter]:bg-card/60 border border-border ios-shadow">
         <div className="flex flex-wrap items-center justify-between px-4 py-4 sm:flex-nowrap sm:px-6 sm:h-20 sm:py-0">
-          
+
           {/* Left Section: Greeting & Quote */}
           <div className="flex flex-col items-start min-w-0 flex-1 order-1">
             <h1 className="text-xl font-semibold tracking-tight text-foreground truncate w-full">
@@ -87,8 +87,8 @@ export function Sidebar({ userName }: SidebarProps) {
                     href={item.href}
                     className={cn(
                       "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200",
-                      isActive 
-                        ? "bg-background shadow-sm text-foreground" 
+                      isActive
+                        ? "bg-background shadow-sm text-foreground"
                         : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                     )}
                   >
@@ -100,7 +100,7 @@ export function Sidebar({ userName }: SidebarProps) {
           </div>
 
           {/* Right Section: Actions & User Menu */}
-          <div className="flex items-center justify-end gap-3 order-2 flex-1 sm:order-3">   
+          <div className="flex items-center justify-end gap-3 order-2 flex-1 sm:order-3">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-9 px-1.5 pr-2 gap-2 rounded-full bg-accent/30 hover:bg-accent border border-border/50 text-foreground transition-all duration-200 focus-visible:ring-0 focus-visible:ring-offset-0">
@@ -130,7 +130,7 @@ export function Sidebar({ userName }: SidebarProps) {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          
+
         </div>
       </header>
     </div>
