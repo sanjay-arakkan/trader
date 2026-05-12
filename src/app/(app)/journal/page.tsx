@@ -395,8 +395,10 @@ export default function JournalPage() {
         </div>
       </div>
 
-      {/* Journal Table */}
-      <JournalTable currentMonth={currentMonth} onMonthChange={setCurrentMonth} />
+      {/* Journal Table — full-bleed on mobile */}
+      <div className="-mx-5 lg:-mx-8">
+        <JournalTable currentMonth={currentMonth} onMonthChange={setCurrentMonth} />
+      </div>
     </div>
   )
 }
