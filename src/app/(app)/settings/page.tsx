@@ -23,20 +23,6 @@ export default function SettingsPage() {
     setMounted(true)
   }, [])
 
-  // Sync theme only once on mount
-  const syncedRef = React.useRef(false)
-  React.useEffect(() => {
-    if (syncedRef.current) return
-    syncedRef.current = true
-    
-    const syncTheme = async () => {
-        const settings = await journalService.getSettings()
-        if (settings?.theme) {
-            setTheme(settings.theme)
-        }
-    }
-    syncTheme()
-  }, [setTheme])
 
   const handleThemeChange = async (newTheme: string) => {
       setTheme(newTheme)
