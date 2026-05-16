@@ -25,8 +25,11 @@ type ChartEntry = {
   displayDate: string
   capital: number
   profit: number
+  cappedProfit: number
   brokerage: number
+  cappedBrokerage: number
   netProfit: number
+  cappedNetProfit: number
   status: string
 }
 
@@ -36,6 +39,7 @@ type MonthlySummary = {
   profit: number
   brokerage: number
   netProfit: number
+  cappedNetProfit: number
 }
 
 type WeeklySummary = {
@@ -44,18 +48,24 @@ type WeeklySummary = {
   profit: number
   brokerage: number
   netProfit: number
+  cappedNetProfit: number
 }
 
 // Reusable Custom Tooltip Component
-const CustomTooltip = ({ active, payload, label, prefix = "", suffix = "", colorClass = "text-foreground" }: {
+const CustomTooltip = ({ active, payload, label, prefix = "", suffix = "", colorClass = "text-foreground", valueKey }: {
   active?: boolean
-  payload?: readonly { value: number }[]
+  payload?: readonly any[]
   label?: string | number
   prefix?: string
   suffix?: string
   colorClass?: string
+  valueKey?: string
 }) => {
   if (active && payload && payload.length) {
+    const displayValue = valueKey && payload[0].payload[valueKey] !== undefined 
+      ? payload[0].payload[valueKey] 
+      : payload[0].value;
+
     return (
       <div className="rounded-lg border bg-background p-3 shadow-lg ring-1 ring-black/5">
         <div className="mb-1 text-[0.65rem] uppercase tracking-wider text-muted-foreground font-medium">
@@ -67,7 +77,7 @@ const CustomTooltip = ({ active, payload, label, prefix = "", suffix = "", color
             currency: 'INR',
             maximumFractionDigits: 0,
             minimumFractionDigits: 0
-          }).format(payload[0].value)}{suffix}
+          }).format(displayValue)}{suffix}
         </div>
       </div>
     )
@@ -99,15 +109,23 @@ export default function InsightsPage() {
     const todayStr = format(new Date(), "yyyy-MM-dd");
     return entries
       .filter(e => e.date <= todayStr)
-      .map(e => ({
-      date: e.date,
-      displayDate: format(parseISO(e.date), "MMM dd"),
-      capital: e.capital || 0,
-      profit: e.profit || 0,
-      brokerage: e.brokerage || 0,
-      netProfit: (e.profit || 0) - (e.brokerage || 0),
-      status: e.status || ""
-    }))
+      .map(e => {
+        const profit = e.profit || 0;
+        const brokerage = e.brokerage || 0;
+        const netProfit = profit - brokerage;
+        return {
+          date: e.date,
+          displayDate: format(parseISO(e.date), "MMM dd"),
+          capital: e.capital || 0,
+          profit,
+          cappedProfit: Math.max(-200000, Math.min(200000, profit)),
+          brokerage,
+          cappedBrokerage: Math.max(0, Math.min(10000, brokerage)),
+          netProfit,
+          cappedNetProfit: Math.max(-200000, Math.min(200000, netProfit)),
+          status: e.status || ""
+        }
+      })
   }, [entries])
 
   // Cumulative profit data
@@ -132,14 +150,18 @@ export default function InsightsPage() {
           monthLabel: format(parseISO(monthKey + "-01"), "MMM yyyy"),
           profit: 0,
           brokerage: 0,
-          netProfit: 0
+          netProfit: 0,
+          cappedNetProfit: 0
         }
       }
       monthMap[monthKey].profit += e.profit || 0
       monthMap[monthKey].brokerage += e.brokerage || 0
       monthMap[monthKey].netProfit += (e.profit || 0) - (e.brokerage || 0)
     })
-    return Object.values(monthMap).sort((a, b) => a.month.localeCompare(b.month))
+    return Object.values(monthMap).map(m => ({
+      ...m,
+      cappedNetProfit: Math.max(-500000, Math.min(500000, m.netProfit))
+    })).sort((a, b) => a.month.localeCompare(b.month))
   }, [entries])
 
   // Weekly summary
@@ -157,14 +179,18 @@ export default function InsightsPage() {
           weekLabel: format(startOfWeek(date, { weekStartsOn: 1 }), "MMM dd"),
           profit: 0,
           brokerage: 0,
-          netProfit: 0
+          netProfit: 0,
+          cappedNetProfit: 0
         }
       }
       weekMap[weekKey].profit += e.profit || 0
       weekMap[weekKey].brokerage += e.brokerage || 0
       weekMap[weekKey].netProfit += (e.profit || 0) - (e.brokerage || 0)
     })
-    return Object.values(weekMap).sort((a, b) => a.week.localeCompare(b.week))
+    return Object.values(weekMap).map(w => ({
+      ...w,
+      cappedNetProfit: Math.max(-300000, Math.min(300000, w.netProfit))
+    })).sort((a, b) => a.week.localeCompare(b.week))
   }, [entries])
 
   // Stats calculations
@@ -587,7 +613,7 @@ export default function InsightsPage() {
                 <YAxis 
                   className="text-xs font-medium" 
                   tick={{ fill: 'var(--muted-foreground)' }}
-                  domain={[-150000, 150000]}
+                  domain={[-200000, 200000]}
                   tickFormatter={(v) => `₹${(v/1000).toFixed(0)}k`}
                   axisLine={false}
                   tickLine={false}
@@ -598,12 +624,13 @@ export default function InsightsPage() {
                   position={{ y: 0 }}
                   content={({ active, payload, label }) => {
                     if (active && payload && payload.length) {
-                      const isPositive = Number(payload[0].value) >= 0
+                      const isPositive = Number(payload[0].payload.profit) >= 0
                       return (
                         <CustomTooltip 
                           active={active} 
                           payload={payload} 
                           label={label} 
+                          valueKey="profit"
                           colorClass={isPositive ? "text-green-600" : "text-red-600"}
                         />
                       )
@@ -612,12 +639,12 @@ export default function InsightsPage() {
                   }}
                 />
                 <ReferenceLine y={0} stroke="var(--muted-foreground)" strokeOpacity={0.5} />
-                <Bar dataKey="profit" radius={[2, 2, 0, 0]}>
+                <Bar dataKey="cappedProfit" radius={[2, 2, 0, 0]}>
                   {chartData.map((entry, index) => (
                     <Cell 
                       key={`cell-${index}`} 
-                      fill={entry.profit >= 0 ? "hsl(142, 76%, 36%)" : "hsl(0, 84%, 40%)"}
-                      stroke={entry.profit >= 0 ? "hsl(142, 76%, 36%)" : "hsl(0, 84%, 40%)"}
+                      fill={entry.cappedProfit >= 0 ? "hsl(142, 76%, 36%)" : "hsl(0, 84%, 40%)"}
+                      stroke={entry.cappedProfit >= 0 ? "hsl(142, 76%, 36%)" : "hsl(0, 84%, 40%)"}
                       strokeWidth={1}
                     />
                   ))}
@@ -659,10 +686,10 @@ export default function InsightsPage() {
                 <Tooltip 
                   cursor={{ fill: 'transparent' }}
                   position={{ y: 0 }}
-                  content={<CustomTooltip colorClass="text-primary" />}
+                  content={<CustomTooltip colorClass="text-primary" valueKey="brokerage" />}
                 />
                 <Bar 
-                  dataKey="brokerage" 
+                  dataKey="cappedBrokerage" 
                   fill="hsl(25, 95%, 45%)"
                   stroke="hsl(25, 95%, 45%)"
                   strokeWidth={1}
@@ -751,6 +778,7 @@ export default function InsightsPage() {
                   <YAxis 
                     className="text-xs font-medium" 
                     tick={{ fill: 'var(--muted-foreground)' }}
+                    domain={[-300000, 300000]}
                     tickFormatter={(v) => `₹${(v/1000).toFixed(0)}k`}
                     axisLine={false}
                     tickLine={false}
@@ -761,12 +789,13 @@ export default function InsightsPage() {
                     position={{ y: 0 }}
                     content={({ active, payload, label }) => {
                       if (active && payload && payload.length) {
-                         const isPositive = Number(payload[0].value) >= 0
+                         const isPositive = Number(payload[0].payload.netProfit) >= 0
                          return (
                           <CustomTooltip 
                             active={active} 
                             payload={payload} 
                             label={label}
+                            valueKey="netProfit"
                             colorClass={isPositive ? "text-green-600" : "text-red-600"} 
                            />
                          )
@@ -776,14 +805,14 @@ export default function InsightsPage() {
                   />
                   <ReferenceLine y={0} stroke="var(--muted-foreground)" strokeOpacity={0.5} />
                   <Bar 
-                    dataKey="netProfit" 
+                    dataKey="cappedNetProfit" 
                     radius={[2, 2, 0, 0]}
                   >
                     {weeklySummary.map((entry, index) => (
                       <Cell 
                         key={`cell-${index}`} 
-                        fill={entry.netProfit >= 0 ? "hsl(142, 76%, 36%)" : "hsl(0, 84%, 40%)"}
-                        stroke={entry.netProfit >= 0 ? "hsl(142, 76%, 36%)" : "hsl(0, 84%, 40%)"}
+                        fill={entry.cappedNetProfit >= 0 ? "hsl(142, 76%, 36%)" : "hsl(0, 84%, 40%)"}
+                        stroke={entry.cappedNetProfit >= 0 ? "hsl(142, 76%, 36%)" : "hsl(0, 84%, 40%)"}
                         strokeWidth={1}
                       />
                     ))}
@@ -816,6 +845,7 @@ export default function InsightsPage() {
                   <YAxis 
                     className="text-xs font-medium" 
                     tick={{ fill: 'var(--muted-foreground)' }}
+                    domain={[-500000, 500000]}
                     tickFormatter={(v) => `₹${(v/1000).toFixed(0)}k`}
                     axisLine={false}
                     tickLine={false}
@@ -826,12 +856,13 @@ export default function InsightsPage() {
                     position={{ y: 0 }}
                     content={({ active, payload, label }) => {
                       if (active && payload && payload.length) {
-                         const isPositive = Number(payload[0].value) >= 0
+                         const isPositive = Number(payload[0].payload.netProfit) >= 0
                          return (
                           <CustomTooltip 
                             active={active} 
                             payload={payload} 
                             label={label}
+                            valueKey="netProfit"
                             colorClass={isPositive ? "text-green-600" : "text-red-600"} 
                            />
                          )
@@ -841,14 +872,14 @@ export default function InsightsPage() {
                   />
                   <ReferenceLine y={0} stroke="var(--muted-foreground)" strokeOpacity={0.5} />
                   <Bar 
-                    dataKey="netProfit" 
+                    dataKey="cappedNetProfit" 
                     radius={[2, 2, 0, 0]}
                   >
                     {monthlySummary.map((entry, index) => (
                       <Cell 
                         key={`cell-${index}`} 
-                        fill={entry.netProfit >= 0 ? "hsl(142, 76%, 36%)" : "hsl(0, 84%, 40%)"}
-                        stroke={entry.netProfit >= 0 ? "hsl(142, 76%, 36%)" : "hsl(0, 84%, 40%)"}
+                        fill={entry.cappedNetProfit >= 0 ? "hsl(142, 76%, 36%)" : "hsl(0, 84%, 40%)"}
+                        stroke={entry.cappedNetProfit >= 0 ? "hsl(142, 76%, 36%)" : "hsl(0, 84%, 40%)"}
                         strokeWidth={1}
                       />
                     ))}
