@@ -103,6 +103,19 @@ export const journalService = {
     return data
   },
 
+  async getAllWeeklyNotes() {
+    const { data, error } = await supabase
+      .from('weekly_journal_notes')
+      .select('*')
+      .order('week_key', { ascending: true })
+
+    if (error) {
+      console.error('Error fetching all weekly notes:', error)
+      return []
+    }
+    return data
+  },
+
   async saveWeeklyNote(weekKey: string, mondayDate: Date, note: string, add_withdraw_funds?: number | null) {
      const { data: { user } } = await supabase.auth.getUser()
      if (!user) return null

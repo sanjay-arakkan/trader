@@ -16,7 +16,7 @@ import {
   Cell,
 } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { journalService, type JournalEntryData } from "@/services/journal-service"
+import { journalService, type JournalEntryData, type WeeklyNoteData } from "@/services/journal-service"
 import { TrendingUp, TrendingDown, Target, Percent, Calendar, Trophy, Flame } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -87,14 +87,19 @@ const CustomTooltip = ({ active, payload, label, prefix = "", suffix = "", color
 
 export default function InsightsPage() {
   const [entries, setEntries] = React.useState<JournalEntryData[]>([])
+  const [weeklyNotes, setWeeklyNotes] = React.useState<WeeklyNoteData[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
 
   React.useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true)
       try {
-        const data = await journalService.getAllEntries()
+        const [data, notes] = await Promise.all([
+          journalService.getAllEntries(),
+          journalService.getAllWeeklyNotes()
+        ]);
         setEntries(data || [])
+        setWeeklyNotes(notes || [])
       } catch (e) {
         console.error("Failed to fetch entries", e)
       } finally {
@@ -192,6 +197,30 @@ export default function InsightsPage() {
       cappedNetProfit: Math.max(-300000, Math.min(300000, w.netProfit))
     })).sort((a, b) => a.week.localeCompare(b.week))
   }, [entries])
+
+  // Weekly funds summary
+  const weeklyFundsSummary = React.useMemo(() => {
+    return weeklyNotes
+      .filter(n => n.add_withdraw_funds != null)
+      .map(n => {
+        let label = n.week_key;
+        if (n.id) {
+          const parts = n.id.split('_');
+          const dateStr = parts[parts.length - 1];
+          if (dateStr && dateStr.length === 8) {
+             const parsed = parseISO(`${dateStr.slice(0,4)}-${dateStr.slice(4,6)}-${dateStr.slice(6,8)}`);
+             label = format(startOfWeek(parsed, { weekStartsOn: 1 }), "MMM dd");
+          }
+        }
+        const funds = n.add_withdraw_funds || 0;
+        return {
+          week: n.week_key,
+          weekLabel: label,
+          funds,
+          cappedFunds: Math.max(0, Math.min(150000, funds))
+        };
+      }).sort((a, b) => a.week.localeCompare(b.week));
+  }, [weeklyNotes])
 
   // Stats calculations
   const stats = React.useMemo(() => {
@@ -880,6 +909,73 @@ export default function InsightsPage() {
                         key={`cell-${index}`} 
                         fill={entry.cappedNetProfit >= 0 ? "hsl(142, 76%, 36%)" : "hsl(0, 84%, 40%)"}
                         stroke={entry.cappedNetProfit >= 0 ? "hsl(142, 76%, 36%)" : "hsl(0, 84%, 40%)"}
+                        strokeWidth={1}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Weekly Funds Bar Chart */}
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle>Weekly Add/Withdraw Funds</CardTitle>
+            <CardDescription>Capital added or withdrawn by week</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={weeklyFundsSummary}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--muted-foreground)" strokeOpacity={0.2} />
+                  <XAxis 
+                    dataKey="weekLabel" 
+                    className="text-xs font-medium" 
+                    tick={{ fill: 'var(--muted-foreground)' }} 
+                    axisLine={false}
+                    tickLine={false}
+                    tickMargin={10}
+                  />
+                  <YAxis 
+                    className="text-xs font-medium" 
+                    tick={{ fill: 'var(--muted-foreground)' }}
+                    domain={[0, 150000]}
+                    tickFormatter={(v) => `₹${(v/1000).toFixed(0)}k`}
+                    axisLine={false}
+                    tickLine={false}
+                    tickMargin={10}
+                  />
+                  <Tooltip 
+                    cursor={{ fill: 'transparent' }}
+                    position={{ y: 0 }}
+                    content={({ active, payload, label }) => {
+                      if (active && payload && payload.length) {
+                         const isPositive = Number(payload[0].payload.funds) >= 0
+                         return (
+                          <CustomTooltip 
+                            active={active} 
+                            payload={payload} 
+                            label={label}
+                            valueKey="funds"
+                            colorClass={isPositive ? "text-green-600" : "text-red-600"} 
+                           />
+                         )
+                      }
+                      return null
+                    }}
+                  />
+                  <ReferenceLine y={0} stroke="var(--muted-foreground)" strokeOpacity={0.5} />
+                  <Bar 
+                    dataKey="cappedFunds" 
+                    radius={[2, 2, 0, 0]}
+                  >
+                    {weeklyFundsSummary.map((entry, index) => (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={entry.cappedFunds >= 0 ? "hsl(217, 91%, 60%)" : "hsl(0, 84%, 40%)"}
+                        stroke={entry.cappedFunds >= 0 ? "hsl(217, 91%, 60%)" : "hsl(0, 84%, 40%)"}
                         strokeWidth={1}
                       />
                     ))}
