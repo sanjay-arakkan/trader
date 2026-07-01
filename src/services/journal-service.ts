@@ -17,6 +17,7 @@ export type WeeklyNoteData = {
   id?: string // YYYYMMDD (Monday)
   week_key: string
   note: string
+  add_withdraw_funds?: number | null
 }
 
 export type UserSettings = {
@@ -102,7 +103,7 @@ export const journalService = {
     return data
   },
 
-  async saveWeeklyNote(weekKey: string, mondayDate: Date, note: string) {
+  async saveWeeklyNote(weekKey: string, mondayDate: Date, note: string, add_withdraw_funds?: number | null) {
      const { data: { user } } = await supabase.auth.getUser()
      if (!user) return null
 
@@ -112,6 +113,7 @@ export const journalService = {
          id,
          week_key: weekKey,
          note,
+         add_withdraw_funds,
          user_id: user.id,
          updated_at: new Date().toISOString()
      }

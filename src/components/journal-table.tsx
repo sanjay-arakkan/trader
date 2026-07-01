@@ -67,6 +67,7 @@ export function JournalTable({ currentMonth: controlledMonth, onMonthChange }: J
     {},
   );
   const [weekNotes, setWeekNotes] = React.useState<Record<string, string>>({});
+  const [weekFunds, setWeekFunds] = React.useState<Record<string, string>>({});
   const [config, setConfig] = React.useState<Config>({
     initialCapital: 0,
     startDate: null,
@@ -84,6 +85,7 @@ export function JournalTable({ currentMonth: controlledMonth, onMonthChange }: J
     null,
   );
   const [originalNote, setOriginalNote] = React.useState<string>("");
+  const [originalFunds, setOriginalFunds] = React.useState<string>("");
 
   // Load config
   React.useEffect(() => {
@@ -163,10 +165,17 @@ export function JournalTable({ currentMonth: controlledMonth, onMonthChange }: J
       try {
         const notesData = await journalService.getWeeklyNotes(keys);
         const notesMap: Record<string, string> = {};
+        const fundsMap: Record<string, string> = {};
         notesData.forEach(
-          (n: WeeklyNoteData) => (notesMap[n.week_key] = n.note),
+          (n: WeeklyNoteData) => {
+            notesMap[n.week_key] = n.note;
+            if (n.add_withdraw_funds != null) {
+              fundsMap[n.week_key] = n.add_withdraw_funds.toString();
+            }
+          }
         );
         setWeekNotes((prev) => ({ ...prev, ...notesMap }));
+        setWeekFunds((prev) => ({ ...prev, ...fundsMap }));
       } catch (e) {
         console.error(e);
       }
@@ -374,7 +383,7 @@ export function JournalTable({ currentMonth: controlledMonth, onMonthChange }: J
   };
 
   const isNoteChanged = (weekKey: string): boolean => {
-    return (weekNotes[weekKey] || "") !== originalNote;
+    return (weekNotes[weekKey] || "") !== originalNote || (weekFunds[weekKey] || "") !== originalFunds;
   };
 
   const toggleEdit = async (dateStr: string) => {
@@ -437,6 +446,7 @@ export function JournalTable({ currentMonth: controlledMonth, onMonthChange }: J
             weekKey,
             weekStart,
             weekNotes[weekKey] || "",
+            weekFunds[weekKey] ? parseFloat(weekFunds[weekKey]) : null
           );
           toast.success("Note saved");
         } catch (e) {
@@ -446,11 +456,14 @@ export function JournalTable({ currentMonth: controlledMonth, onMonthChange }: J
       } else {
         // Cancel - revert to original
         setWeekNotes((prev) => ({ ...prev, [weekKey]: originalNote }));
+        setWeekFunds((prev) => ({ ...prev, [weekKey]: originalFunds }));
       }
       setEditingNote(null);
       setOriginalNote("");
+      setOriginalFunds("");
     } else {
       setOriginalNote(weekNotes[weekKey] || "");
+      setOriginalFunds(weekFunds[weekKey] || "");
       setEditingNote(weekKey);
     }
   };
@@ -873,6 +886,34 @@ export function JournalTable({ currentMonth: controlledMonth, onMonthChange }: J
                         </div>
 
                         <div className="flex flex-col space-y-2 group">
+                          {editingNote === weekKey ? (
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-semibold text-muted-foreground w-32">
+                                Add/Withdraw Funds:
+                              </span>
+                              <Input
+                                type="number"
+                                placeholder="e.g. 10000 or -5000"
+                                className="h-8 max-w-[200px]"
+                                value={weekFunds[weekKey] || ""}
+                                onChange={(e) =>
+                                  setWeekFunds((prev) => ({
+                                    ...prev,
+                                    [weekKey]: e.target.value,
+                                  }))
+                                }
+                              />
+                            </div>
+                          ) : weekFunds[weekKey] && weekFunds[weekKey] !== "0" ? (
+                             <div className="flex items-center gap-2 mb-2">
+                                <span className="text-xs font-semibold text-muted-foreground">
+                                  Add/Withdraw Funds:
+                                </span>
+                                <span className={cn("text-sm font-medium", parseFloat(weekFunds[weekKey]) > 0 ? "text-[var(--ios-system-green)]" : "text-[var(--ios-system-red)]")}>
+                                  {formatCurrency(parseFloat(weekFunds[weekKey]))}
+                                </span>
+                             </div>
+                          ) : null}
                           <div className="flex items-center justify-between">
                             <span className="text-xs font-semibold text-muted-foreground">
                               Weekly Notes & Lessons (
