@@ -217,7 +217,7 @@ export default function InsightsPage() {
           week: n.week_key,
           weekLabel: label,
           funds,
-          cappedFunds: Math.max(0, Math.min(150000, funds))
+          cappedFunds: Math.max(-150000, Math.min(150000, funds))
         };
       }).sort((a, b) => a.week.localeCompare(b.week));
   }, [weeklyNotes])
@@ -919,7 +919,7 @@ export default function InsightsPage() {
           </CardContent>
         </Card>
 
-        {/* Weekly Funds Bar Chart */}
+        {/* Weekly Funds Area Chart */}
         <Card className="md:col-span-2">
           <CardHeader>
             <CardTitle>Weekly Add/Withdraw Funds</CardTitle>
@@ -928,7 +928,13 @@ export default function InsightsPage() {
           <CardContent>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={weeklyFundsSummary}>
+                <AreaChart data={weeklyFundsSummary}>
+                  <defs>
+                    <linearGradient id="fundsGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="var(--muted-foreground)" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="var(--muted-foreground)" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--muted-foreground)" strokeOpacity={0.2} />
                   <XAxis 
                     dataKey="weekLabel" 
@@ -941,14 +947,14 @@ export default function InsightsPage() {
                   <YAxis 
                     className="text-xs font-medium" 
                     tick={{ fill: 'var(--muted-foreground)' }}
-                    domain={[0, 150000]}
+                    domain={[-150000, 150000]}
                     tickFormatter={(v) => `₹${(v/1000).toFixed(0)}k`}
                     axisLine={false}
                     tickLine={false}
                     tickMargin={10}
                   />
                   <Tooltip 
-                    cursor={{ fill: 'transparent' }}
+                    cursor={{ stroke: 'var(--muted-foreground)', strokeWidth: 1, strokeDasharray: '3 3' }}
                     position={{ y: 0 }}
                     content={({ active, payload, label }) => {
                       if (active && payload && payload.length) {
@@ -959,28 +965,23 @@ export default function InsightsPage() {
                             payload={payload} 
                             label={label}
                             valueKey="funds"
-                            colorClass={isPositive ? "text-green-600" : "text-red-600"} 
+                            colorClass={isPositive ? "text-muted-foreground" : "text-red-600"} 
                            />
                          )
                       }
                       return null
                     }}
                   />
-                  <ReferenceLine y={0} stroke="var(--muted-foreground)" strokeOpacity={0.5} />
-                  <Bar 
+                  <ReferenceLine y={0} stroke="var(--muted-foreground)" strokeDasharray="3 3" />
+                  <Area 
+                    type="natural"
                     dataKey="cappedFunds" 
-                    radius={[2, 2, 0, 0]}
-                  >
-                    {weeklyFundsSummary.map((entry, index) => (
-                      <Cell 
-                        key={`cell-${index}`} 
-                        fill={entry.cappedFunds >= 0 ? "hsl(217, 91%, 60%)" : "hsl(0, 84%, 40%)"}
-                        stroke={entry.cappedFunds >= 0 ? "hsl(217, 91%, 60%)" : "hsl(0, 84%, 40%)"}
-                        strokeWidth={1}
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
+                    stroke="var(--muted-foreground)"
+                    strokeWidth={2}
+                    fill="url(#fundsGradient)"
+                    activeDot={{ r: 4, strokeWidth: 2, fill: "var(--background)", stroke: "var(--muted-foreground)" }}
+                  />
+                </AreaChart>
               </ResponsiveContainer>
             </div>
           </CardContent>
